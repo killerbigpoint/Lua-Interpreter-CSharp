@@ -23,7 +23,14 @@ namespace L2C
 
             LuaScript hack = LuaLoader.LoadLua("hack");
 
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
+
             LuaInterpreter.ExecuteFunction(hack, "OnUpdate");
+
+            stopwatch.Stop();
+
+            Console.WriteLine($"Elapsed Time is {stopwatch.ElapsedMilliseconds} ms");
 
             Console.ReadLine();
         }

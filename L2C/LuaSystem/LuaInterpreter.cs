@@ -86,15 +86,16 @@ namespace MunchenClient.Lua
 
             if(comparatorArgumentFirst == comparatorArgumentSecond)
             {
-                //TODO: RUN INSTRUCTIONS INSIDE THIS NIGGA
-
-                Console.WriteLine("IT IS THE SAME");
+                Console.WriteLine("Arguments were the same");
             }
             else
             {
-                //TODO: CHEK FOR ELSE STATEMENT, IF SO RUN THAT NIGGA INSTEAD
+                int elseStatementIndex = script.IndexOf("else", comparatorIndex);
 
-                Console.WriteLine("IT IS NOT THE SAME");
+                if(elseStatementIndex != -1)
+                {
+                    Console.WriteLine("Else statement found");
+                }
             }
 
             return true;
