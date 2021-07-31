@@ -10,6 +10,5 @@ namespace MunchenClient.Lua
     {
         internal string functionName;
         internal string functionCode;
-        internal List<LuaInstruction> functionInstructions;
     }
 }

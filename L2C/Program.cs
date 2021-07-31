@@ -24,6 +24,8 @@ namespace L2C
             LuaScript hack = LuaLoader.LoadLua("hack");
 
             LuaInterpreter.ExecuteFunction(hack, "OnUpdate");
+
+            Console.ReadLine();
         }
     }
 }
