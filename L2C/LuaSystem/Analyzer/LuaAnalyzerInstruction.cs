@@ -1,5 +1,6 @@
-﻿using System;
+﻿using MunchenClient.Lua.Instructions;
 using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,51 +13,51 @@ namespace MunchenClient.Lua.Analyzer
         {
             Console.WriteLine("Analyze Script: " + function.functionCode);
 
-            /*for (int i = 0; i < function.functionCode.Length; i++)
+            for (int i = 0; i < function.functionCode.Length; i++)
             {
-                if (CheckForInternalInstruction(function.functionCode, i) == true)
+                if (CheckForInternalInstruction(function, i) == true)
                 {
                     continue;
                 }
-                else if (CheckForIfStatement(function.functionCode, i) == true)
+                else if (CheckForIfStatement(function, i) == true)
                 {
                     continue;
                 }
-            }*/
+            }
 
             return true;
         }
 
-        private static bool CheckForInternalInstruction(string script, int index)
+        private static bool CheckForInternalInstruction(LuaFunction function, int index)
         {
             //Make sure we got enough space for a potential function and won't hit the end of the script
-            if ((script.Length - index) < 8)
+            if ((function.functionCode.Length - index) < 8)
             {
                 return false;
             }
 
-            int instructionIndex = script.IndexOf(";", index);
+            int instructionEndIndex = function.functionCode.IndexOf(";", index);
 
-            if (instructionIndex == -1)
+            if (instructionEndIndex == -1)
             {
                 return false;
             }
 
-            int instructionParameterStart = script.IndexOf("(", index);
-            int instructionParameterEnd = script.IndexOf(")", index);
+            int instructionParameterStart = function.functionCode.IndexOf("(", index);
+            int instructionParameterEnd = function.functionCode.IndexOf(")", index);
 
             if (instructionParameterStart == -1 || instructionParameterEnd == -1 || instructionParameterStart > instructionParameterEnd)
             {
                 return false;
             }
 
-            string instructionName = script.Substring(index, instructionParameterStart - index);
+            string instructionName = function.functionCode.Substring(index, instructionParameterStart - index);
 
             if (LuaWrapper.InternalFunctionExists(instructionName) == true)
             {
                 if (index > 1)
                 {
-                    int commentedOutIndex = script.IndexOf("//", index - 2, 2);
+                    int commentedOutIndex = function.functionCode.IndexOf("//", index - 2, 2);
 
                     if (commentedOutIndex != -1)
                     {
@@ -64,7 +65,7 @@ namespace MunchenClient.Lua.Analyzer
                     }
                 }
 
-                string instructionParameters = script.Substring(instructionParameterStart + 1, instructionParameterEnd - instructionParameterStart - 1);
+                string instructionParameters = function.functionCode.Substring(instructionParameterStart + 1, instructionParameterEnd - instructionParameterStart - 1);
                 List<object> parameters = new List<object>();
 
                 foreach (string parameter in instructionParameters.Split(','))
@@ -72,7 +73,14 @@ namespace MunchenClient.Lua.Analyzer
                     parameters.Add(DetermineParamterType(parameter.Trim()));
                 }
 
-                LuaWrapper.CallInternalFunction(instructionName, parameters.ToArray());
+                string instructionCode = function.functionCode.Substring(index, instructionEndIndex - index);
+
+                function.functionExecutionList.Add(new LuaInstructionInternal
+                {
+                    instructionName = instructionName,
+                    instructionCode = instructionCode,
+                    instructionParameters = parameters.ToArray()
+                });
 
                 return true;
             }
@@ -103,15 +111,15 @@ namespace MunchenClient.Lua.Analyzer
             return parameter;
         }
 
-        private static bool CheckForIfStatement(string script, int index)
+        private static bool CheckForIfStatement(LuaFunction function, int index)
         {
-            if (script.Substring(index).StartsWith("if") == false)
+            if (function.functionCode.Substring(index).StartsWith("if") == false)
             {
                 return false;
             }
 
-            int instructionParameterStart = script.IndexOf("(", index);
-            int instructionParameterEnd = script.IndexOf(")", index);
+            int instructionParameterStart = function.functionCode.IndexOf("(", index);
+            int instructionParameterEnd = function.functionCode.IndexOf(")", index);
 
             if (instructionParameterStart == -1 || instructionParameterEnd == -1)
             {
@@ -120,7 +128,7 @@ namespace MunchenClient.Lua.Analyzer
                 return false;
             }
 
-            string statement = script.Substring(instructionParameterStart + 1, instructionParameterEnd - instructionParameterStart - 1);
+            string statement = function.functionCode.Substring(instructionParameterStart + 1, instructionParameterEnd - instructionParameterStart - 1);
 
             Console.WriteLine("Statement: " + statement);
 
@@ -147,7 +155,7 @@ namespace MunchenClient.Lua.Analyzer
             }
             else
             {
-                int elseStatementIndex = script.IndexOf("else", comparator.comparatorIndex);
+                int elseStatementIndex = function.functionCode.IndexOf("else", comparator.comparatorIndex);
 
                 if (elseStatementIndex != -1)
                 {

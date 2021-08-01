@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace MunchenClient.Lua.Instructions
 {
-    internal interface ILuaInstruction
+    internal abstract class ILuaInstruction
     {
-        string InstructionName { get; }
-        string InstructionCode { get; }
+        internal string instructionName;
+        internal string instructionCode;
+        internal object[] instructionParameters;
 
-        void ExecuteInstruction();
+        internal abstract void ExecuteInstruction();
     }
 }

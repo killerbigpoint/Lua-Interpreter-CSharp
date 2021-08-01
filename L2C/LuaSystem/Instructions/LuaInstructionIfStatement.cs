@@ -8,13 +8,10 @@ namespace MunchenClient.Lua.Instructions
 {
     internal class LuaInstructionIfStatement : ILuaInstruction
     {
-        public string InstructionName => string.Empty;
-        public string InstructionCode => string.Empty;
+        internal List<ILuaInstruction> yes = new List<ILuaInstruction>();
+        internal List<ILuaInstruction> no = new List<ILuaInstruction>();
 
-        public List<ILuaInstruction> yes = new List<ILuaInstruction>();
-        public List<ILuaInstruction> no = new List<ILuaInstruction>();
-
-        public void ExecuteInstruction()
+        internal override void ExecuteInstruction()
         {
             
         }

@@ -48,6 +48,11 @@ namespace MunchenClient.Lua
         {
             //TODO: execute instructions in order
 
+            for(int i = 0; i < function.functionExecutionList.Count; i++)
+            {
+                function.functionExecutionList[i].ExecuteInstruction();
+            }
+
             return true;
         }
     }
