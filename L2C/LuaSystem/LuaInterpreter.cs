@@ -11,8 +11,8 @@ namespace MunchenClient.Lua
         ComparatorType_NotEqualTo = 2,
         ComparatorType_LessThan = 3,
         ComparatorType_MoreThan = 4,
-        ComparatorType_MoreOrEqualThan = 4,
-        ComparatorType_LessOrEqualThan = 4,
+        ComparatorType_MoreOrEqualThan = 5,
+        ComparatorType_LessOrEqualThan = 6,
     }
 
     internal struct Comparator
@@ -101,27 +101,86 @@ namespace MunchenClient.Lua
             Console.WriteLine("First Argument: " + comparatorArgumentFirst);
             Console.WriteLine("Second Argument: " + comparatorArgumentSecond);
 
-            //TODO: Function here to compare the values actually
-
-            if(comparatorArgumentFirst == comparatorArgumentSecond)
+            if(ExecuteComparatorCode(comparator.comparatorType, comparatorArgumentFirst, comparatorArgumentSecond) == true)
             {
-                Console.WriteLine("Arguments were the same");
+                
             }
             else
             {
-                
+                int elseStatementIndex = script.IndexOf("else", comparator.comparatorIndex);
+
+                if (elseStatementIndex != -1)
+                {
+                    Console.WriteLine("Found 'Else' statement");
+                }
+                else
+                {
+                    Console.WriteLine("No 'Else' statement found");
+                }
             }
 
-            /*
-                int elseStatementIndex = script.IndexOf("else", comparator.comparatorIndex);
-                
-                if(elseStatementIndex != -1)
-                {
-                    Console.WriteLine("Else statement found");
-                }
-             */
-
             return true;
+        }
+
+        private static bool ExecuteComparatorCode(ComparatorType comparator, string argumentFirst, string argumentSecond)
+        {
+            switch(comparator)
+            {
+                case ComparatorType.ComparatorType_EqualTo:
+                {
+                    return argumentFirst == argumentSecond;
+                }
+
+                case ComparatorType.ComparatorType_NotEqualTo:
+                {
+                    return argumentFirst != argumentSecond;
+                }
+
+                case ComparatorType.ComparatorType_LessThan:
+                {
+                    if(float.TryParse(argumentFirst, out float argumentFirstConverted) == false || float.TryParse(argumentSecond, out float argumentSecondConverted) == false)
+                    {
+                        return false;
+                    }
+
+                    return argumentFirstConverted < argumentSecondConverted;
+                }
+
+                case ComparatorType.ComparatorType_MoreThan:
+                {
+                    if (float.TryParse(argumentFirst, out float argumentFirstConverted) == false || float.TryParse(argumentSecond, out float argumentSecondConverted) == false)
+                    {
+                        return false;
+                    }
+
+                    return argumentFirstConverted > argumentSecondConverted;
+                }
+
+                case ComparatorType.ComparatorType_MoreOrEqualThan:
+                {
+                    if (float.TryParse(argumentFirst, out float argumentFirstConverted) == false || float.TryParse(argumentSecond, out float argumentSecondConverted) == false)
+                    {
+                        return false;
+                    }
+
+                    return argumentFirstConverted >= argumentSecondConverted;
+                }
+
+                case ComparatorType.ComparatorType_LessOrEqualThan:
+                {
+                    if (float.TryParse(argumentFirst, out float argumentFirstConverted) == false || float.TryParse(argumentSecond, out float argumentSecondConverted) == false)
+                    {
+                        return false;
+                    }
+
+                    return argumentFirstConverted <= argumentSecondConverted;
+                }
+
+                default:
+                {
+                    return false;
+                }
+            }
         }
 
         private static Comparator FindComparator(string statement)

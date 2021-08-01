@@ -30,7 +30,7 @@ namespace L2C
 
             stopwatch.Stop();
 
-            Console.WriteLine($"Elapsed Time is {stopwatch.ElapsedMilliseconds} ms");
+            Console.WriteLine($"Elapsed Time is {stopwatch.ElapsedTicks / 10000} ms");
 
             Console.ReadLine();
         }

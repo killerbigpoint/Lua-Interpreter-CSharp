@@ -4,23 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MunchenClient.Lua
+namespace MunchenClient.Lua.Analyzer
 {
-    internal class LuaAnalyzer
+    internal class LuaAnalyzerFunction
     {
         private const string functionPrefix = "function";
-
-        internal static Dictionary<string, LuaFunction> AnalyzeScript(string script)
-        {
-            Dictionary<string, LuaFunction> functions = new Dictionary<string, LuaFunction>();
-
-            for (int i = 0; i < script.Length; i++)
-            {
-                CheckForFunction(script, i, ref functions);
-            }
-
-            return functions;
-        }
 
         internal static bool CheckForFunction(string script, int index, ref Dictionary<string, LuaFunction> list)
         {
@@ -51,7 +39,7 @@ namespace MunchenClient.Lua
             //Make sure our function is valid by checking for brackets
             int bracketIndexStart = script.IndexOf('{', functionEndIndex);
 
-            if(bracketIndexStart == -1)
+            if (bracketIndexStart == -1)
             {
                 return false;
             }
@@ -61,11 +49,11 @@ namespace MunchenClient.Lua
 
             while (bracketDifference >= 1)
             {
-                if(script[functionCurrentIndex] == '{' && functionCurrentIndex != bracketIndexStart)
+                if (script[functionCurrentIndex] == '{' && functionCurrentIndex != bracketIndexStart)
                 {
                     bracketDifference++;
                 }
-                else if(script[functionCurrentIndex] == '}')
+                else if (script[functionCurrentIndex] == '}')
                 {
                     bracketDifference--;
                 }
@@ -83,8 +71,6 @@ namespace MunchenClient.Lua
             //Finish off by adding the function to the collection
             string functionCode = script.Substring(bracketIndexStart + 1, bracketIndexEnd - bracketIndexStart - 2).Trim();
 
-            Console.WriteLine($"Done function analyzing: {functionCode}");
-
             if (bracketIndexEnd == -1 || bracketIndexStart > bracketIndexEnd)
             {
                 return false;
@@ -101,20 +87,14 @@ namespace MunchenClient.Lua
             //Make sure we ain't finding duplicated functions
             if (list.ContainsKey(functionName) == true)
             {
-                Console.WriteLine($"Function: {functionName} duplicate entry found");
-
                 return false;
             }
-
-            Console.WriteLine($"Function: {functionName} Code: {functionCode}");
 
             list.Add(functionName, new LuaFunction
             {
                 functionName = functionName,
                 functionCode = functionCode
             });
-
-            Console.WriteLine($"Function: {functionName} found");
 
             return true;
         }

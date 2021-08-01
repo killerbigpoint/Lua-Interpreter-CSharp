@@ -43,9 +43,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LuaSystem\LuaAnalyzer.cs" />
+    <Compile Include="LuaSystem\Analyzer\LuaAnalyzerFunction.cs" />
+    <Compile Include="LuaSystem\Analyzer\LuaAnalyzerInstruction.cs" />
+    <Compile Include="LuaSystem\Instructions\LuaInstructionIfStatement.cs" />
+    <Compile Include="LuaSystem\Analyzer\LuaAnalyzer.cs" />
     <Compile Include="LuaSystem\LuaCore.cs" />
     <Compile Include="LuaSystem\LuaFunction.cs" />
+    <Compile Include="LuaSystem\Instructions\LuaInstruction.cs" />
     <Compile Include="LuaSystem\LuaInterpreter.cs" />
     <Compile Include="LuaSystem\LuaLoader.cs" />
     <Compile Include="LuaSystem\LuaScript.cs" />
