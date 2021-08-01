@@ -17,8 +17,8 @@ namespace MunchenClient.Utils
 
             ParameterExpression instanceExpression = Expression.Parameter(typeof(object), "instance");
             ParameterExpression argumentsExpression = Expression.Parameter(typeof(object[]), "arguments");
-            List<Expression> argumentExpressions = new List<Expression>();
             ParameterInfo[] parameterInfos = methodInfo.GetParameters();
+            List<Expression> argumentExpressions = new List<Expression>();
 
             for (int i = 0; i < parameterInfos.Length; ++i)
             {
