@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 using System;
+using MunchenClient.Utils;
 
 namespace MunchenClient.Lua
 {
@@ -15,7 +16,7 @@ namespace MunchenClient.Lua
     
     internal class LuaWrapper
     {
-        private static readonly Dictionary<string, Dictionary<int, MethodInfo>> callbacks = new Dictionary<string, Dictionary<int, MethodInfo>>();
+        private static readonly Dictionary<string, Dictionary<int, FastMethodInfo>> callbacks = new Dictionary<string, Dictionary<int, FastMethodInfo>>();
 
         internal static bool InternalFunctionExists(string functionName)
         {
@@ -83,7 +84,7 @@ namespace MunchenClient.Lua
 
             if (callbacks.ContainsKey(functionName) == false)
             {
-                callbacks.Add(functionName, new Dictionary<int, MethodInfo>());
+                callbacks.Add(functionName, new Dictionary<int, FastMethodInfo>());
             }
 
             int internalFunctionParameterCount = internalFunction.GetParameters().Length;
@@ -93,7 +94,7 @@ namespace MunchenClient.Lua
                 return false;
             }
 
-            callbacks[functionName].Add(internalFunctionParameterCount, internalFunction);
+            callbacks[functionName].Add(internalFunctionParameterCount, new FastMethodInfo(internalFunction));
 
             Console.WriteLine($"Registered callback: {functionName} | {internalFunctionParameterCount}");
 
