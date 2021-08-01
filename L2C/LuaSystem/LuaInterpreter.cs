@@ -4,6 +4,23 @@ using System;
 
 namespace MunchenClient.Lua
 {
+    internal enum ComparatorType : short
+    {
+        ComparatorType_Unknown = 0,
+        ComparatorType_EqualTo = 1,
+        ComparatorType_NotEqualTo = 2,
+        ComparatorType_LessThan = 3,
+        ComparatorType_MoreThan = 4,
+        ComparatorType_MoreOrEqualThan = 4,
+        ComparatorType_LessOrEqualThan = 4,
+    }
+
+    internal struct Comparator
+    {
+        internal int comparatorIndex;
+        internal ComparatorType comparatorType;
+    }
+
     internal class LuaInterpreter
     {
         internal static bool ExecuteFunction(LuaScript script, string functionName)
@@ -67,22 +84,24 @@ namespace MunchenClient.Lua
 
             Console.WriteLine("Statement: " + statement);
 
-            int comparatorIndex = FindComparator(statement);
+            Comparator comparator = FindComparator(statement);
 
-            if(comparatorIndex == -1)
+            if(comparator.comparatorType == ComparatorType.ComparatorType_Unknown)
             {
                 Console.WriteLine("No comparator found at index: " + index);
 
                 return false;
             }
 
-            Console.WriteLine("Comparator found at index: " + comparatorIndex);
+            Console.WriteLine("Comparator found at index: " + comparator.comparatorIndex);
 
-            string comparatorArgumentFirst = statement.Substring(0, comparatorIndex).Trim();
-            string comparatorArgumentSecond = statement.Substring(statement.IndexOf(" ", comparatorIndex)).Trim();
+            string comparatorArgumentFirst = statement.Substring(0, comparator.comparatorIndex).Trim();
+            string comparatorArgumentSecond = statement.Substring(statement.IndexOf(" ", comparator.comparatorIndex)).Trim();
 
             Console.WriteLine("First Argument: " + comparatorArgumentFirst);
             Console.WriteLine("Second Argument: " + comparatorArgumentSecond);
+
+            //TODO: Function here to compare the values actually
 
             if(comparatorArgumentFirst == comparatorArgumentSecond)
             {
@@ -90,25 +109,33 @@ namespace MunchenClient.Lua
             }
             else
             {
-                int elseStatementIndex = script.IndexOf("else", comparatorIndex);
+                
+            }
 
+            /*
+                int elseStatementIndex = script.IndexOf("else", comparator.comparatorIndex);
+                
                 if(elseStatementIndex != -1)
                 {
                     Console.WriteLine("Else statement found");
                 }
-            }
+             */
 
             return true;
         }
 
-        private static int FindComparator(string statement)
+        private static Comparator FindComparator(string statement)
         {
             //Comparator Check for "=="
             int comparatorIndex = statement.IndexOf("==");
 
             if (comparatorIndex != -1)
             {
-                return comparatorIndex;
+                return new Comparator
+                {
+                    comparatorIndex = comparatorIndex,
+                    comparatorType = ComparatorType.ComparatorType_EqualTo
+                };
             }
 
             //Comparator Check for "!="
@@ -116,7 +143,11 @@ namespace MunchenClient.Lua
 
             if (comparatorIndex != -1)
             {
-                return comparatorIndex;
+                return new Comparator
+                {
+                    comparatorIndex = comparatorIndex,
+                    comparatorType = ComparatorType.ComparatorType_NotEqualTo
+                };
             }
 
             //Comparator Check for "<"
@@ -124,11 +155,55 @@ namespace MunchenClient.Lua
 
             if (comparatorIndex != -1)
             {
-                return comparatorIndex;
+                return new Comparator
+                {
+                    comparatorIndex = comparatorIndex,
+                    comparatorType = ComparatorType.ComparatorType_LessThan
+                };
             }
 
             //Comparator Check for ">"
-            return statement.IndexOf("!=");
+            comparatorIndex = statement.IndexOf(">");
+
+            if (comparatorIndex != -1)
+            {
+                return new Comparator
+                {
+                    comparatorIndex = comparatorIndex,
+                    comparatorType = ComparatorType.ComparatorType_MoreThan
+                };
+            }
+
+            //Comparator Check for "<="
+            comparatorIndex = statement.IndexOf("<=");
+
+            if (comparatorIndex != -1)
+            {
+                return new Comparator
+                {
+                    comparatorIndex = comparatorIndex,
+                    comparatorType = ComparatorType.ComparatorType_LessOrEqualThan
+                };
+            }
+
+            //Comparator Check for ">="
+            comparatorIndex = statement.IndexOf(">=");
+
+            if (comparatorIndex != -1)
+            {
+                return new Comparator
+                {
+                    comparatorIndex = comparatorIndex,
+                    comparatorType = ComparatorType.ComparatorType_MoreOrEqualThan
+                };
+            }
+
+            //Last Resort
+            return new Comparator
+            {
+                comparatorIndex = -1,
+                comparatorType = ComparatorType.ComparatorType_Unknown
+            }; ;
         }
 
         private static bool CheckForInternalInstruction(string script, int index)
