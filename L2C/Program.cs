@@ -21,14 +21,14 @@ namespace L2C
             LuaWrapper.RegisterFunctionCallback("console.debug", typeof(Program), nameof(OutputToConsole));
             LuaWrapper.RegisterFunctionCallback("console.debug", typeof(Program), nameof(OutputToConsole));
 
-            LuaScript hack = LuaLoader.LoadLua("hack");
-
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
 
-            LuaInterpreter.ExecuteFunction(hack, "OnUpdate");
+            LuaScript hack = LuaLoader.LoadLua("hack");
 
             stopwatch.Stop();
+
+            LuaInterpreter.ExecuteFunction(hack, "OnUpdate");
 
             Console.WriteLine($"Elapsed Time is {stopwatch.ElapsedTicks / 10000} ms");
 

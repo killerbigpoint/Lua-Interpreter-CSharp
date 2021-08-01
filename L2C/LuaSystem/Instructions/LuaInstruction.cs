@@ -8,6 +8,7 @@ namespace MunchenClient.Lua.Instructions
 {
     internal abstract class ILuaInstruction
     {
+        internal LuaFunction instructionFunction;
         internal string instructionName;
         internal string instructionCode;
         internal object[] instructionParameters;

@@ -4,6 +4,12 @@ using System;
 
 namespace MunchenClient.Lua.Analyzer
 {
+    internal struct InstructionAnalyzeReport
+    {
+        internal bool found;
+        internal int skipAhead;
+    }
+
     internal class LuaAnalyzerInstruction
     {
         internal static bool CheckForInstructions(LuaFunction function)
@@ -12,12 +18,23 @@ namespace MunchenClient.Lua.Analyzer
 
             for (int i = 0; i < function.functionCode.Length; i++)
             {
-                if (CheckForInternalInstruction(function, i) == true)
+                //Check for internal instruction
+                InstructionAnalyzeReport postAnalyze = CheckForInternalInstruction(function, i);
+
+                if (postAnalyze.found == true)
                 {
+                    i += postAnalyze.skipAhead;
+
                     continue;
                 }
-                else if (CheckForIfStatement(function, i) == true)
+
+                //Check for 'if' statement
+                postAnalyze = CheckForIfStatement(function, i);
+
+                if (postAnalyze.found == true)
                 {
+                    i += postAnalyze.skipAhead;
+
                     continue;
                 }
             }
@@ -25,19 +42,25 @@ namespace MunchenClient.Lua.Analyzer
             return true;
         }
 
-        private static bool CheckForInternalInstruction(LuaFunction function, int index)
+        private static InstructionAnalyzeReport CheckForInternalInstruction(LuaFunction function, int index)
         {
+            InstructionAnalyzeReport report = new InstructionAnalyzeReport
+            {
+                found = false,
+                skipAhead = 0
+            };
+
             //Make sure we got enough space for a potential function and won't hit the end of the script
             if ((function.functionCode.Length - index) < 8)
             {
-                return false;
+                return report;
             }
 
             int instructionEndIndex = function.functionCode.IndexOf(";", index);
 
             if (instructionEndIndex == -1)
             {
-                return false;
+                return report;
             }
 
             int instructionParameterStart = function.functionCode.IndexOf("(", index);
@@ -45,14 +68,14 @@ namespace MunchenClient.Lua.Analyzer
 
             if (instructionParameterStart == -1 || instructionParameterEnd == -1 || instructionParameterStart > instructionParameterEnd)
             {
-                return false;
+                return report;
             }
 
             string instructionName = function.functionCode.Substring(index, instructionParameterStart - index);
 
             if (LuaWrapper.InternalFunctionExists(instructionName) == false)
             {
-                return false;
+                return report;
             }
 
             if (index > 1)
@@ -61,7 +84,7 @@ namespace MunchenClient.Lua.Analyzer
 
                 if (commentedOutIndex != -1)
                 {
-                    return false;
+                    return report;
                 }
             }
 
@@ -74,12 +97,16 @@ namespace MunchenClient.Lua.Analyzer
 
             function.functionExecutionList.Add(new LuaInstructionInternal
             {
+                instructionFunction = function,
                 instructionName = instructionName,
                 instructionCode = function.functionCode.Substring(index, instructionEndIndex - index),
                 instructionParameters = parameters.ToArray()
             });
 
-            return true;
+            report.found = true;
+            report.skipAhead = instructionEndIndex - index;
+
+            return report;
         }
 
         private static object DetermineParamterType(string parameter)
@@ -105,11 +132,17 @@ namespace MunchenClient.Lua.Analyzer
             return parameter;
         }
 
-        private static bool CheckForIfStatement(LuaFunction function, int index)
+        private static InstructionAnalyzeReport CheckForIfStatement(LuaFunction function, int index)
         {
+            InstructionAnalyzeReport report = new InstructionAnalyzeReport
+            {
+                found = false,
+                skipAhead = 0
+            };
+
             if (function.functionCode.Substring(index).StartsWith("if") == false)
             {
-                return false;
+                return report;
             }
 
             int instructionParameterStart = function.functionCode.IndexOf("(", index);
@@ -119,7 +152,7 @@ namespace MunchenClient.Lua.Analyzer
             {
                 Console.WriteLine("Invalid statement found at index: " + index);
 
-                return false;
+                return report;
             }
 
             string statement = function.functionCode.Substring(instructionParameterStart + 1, instructionParameterEnd - instructionParameterStart - 1);
@@ -132,7 +165,7 @@ namespace MunchenClient.Lua.Analyzer
             {
                 Console.WriteLine("No comparator found at index: " + index);
 
-                return false;
+                return report;
             }
 
             Console.WriteLine("Comparator found at index: " + comparator.comparatorIndex);
@@ -143,25 +176,63 @@ namespace MunchenClient.Lua.Analyzer
             Console.WriteLine("First Argument: " + comparatorArgumentFirst);
             Console.WriteLine("Second Argument: " + comparatorArgumentSecond);
 
-            if (ExecuteComparatorCode(comparator.comparatorType, comparatorArgumentFirst, comparatorArgumentSecond) == true)
-            {
+            int firstCodeBlockIndexStart = function.functionCode.IndexOf("{", instructionParameterEnd);
+            int firstCodeBlockIndexEnd = function.functionCode.IndexOf("}", firstCodeBlockIndexStart);
 
-            }
-            else
+            if(firstCodeBlockIndexStart == -1 || firstCodeBlockIndexEnd == -1)
             {
-                int elseStatementIndex = function.functionCode.IndexOf("else", comparator.comparatorIndex);
-
-                if (elseStatementIndex != -1)
-                {
-                    Console.WriteLine("Found 'Else' statement");
-                }
-                else
-                {
-                    Console.WriteLine("No 'Else' statement found");
-                }
+                return report;
             }
 
-            return true;
+            string firstCodeBlockCode = function.functionCode.Substring(firstCodeBlockIndexStart + 1, firstCodeBlockIndexEnd - firstCodeBlockIndexStart - 1);
+            string secondCodeBlockCode = string.Empty;
+
+            int elseStatementIndex = function.functionCode.IndexOf("else", firstCodeBlockIndexEnd);
+
+            if (elseStatementIndex != -1)
+            {
+                Console.WriteLine("Found 'Else' statement");
+
+                int secondCodeBlockIndexStart = function.functionCode.IndexOf("{", elseStatementIndex);
+                int secondCodeBlockIndexEnd = function.functionCode.IndexOf("}", secondCodeBlockIndexStart);
+
+                if (secondCodeBlockIndexStart != -1 && secondCodeBlockIndexEnd != -1)
+                {
+                    secondCodeBlockCode = function.functionCode.Substring(secondCodeBlockIndexStart + 1, secondCodeBlockIndexEnd - secondCodeBlockIndexStart - 1);
+                }
+            }
+
+            Console.WriteLine("First Code: " + firstCodeBlockCode);
+            Console.WriteLine("Second Code: " + secondCodeBlockCode);
+
+            function.functionExecutionList.Add(new LuaInstructionIfStatement
+            {
+                argumentComparator = comparator,
+                argumentFirst = comparatorArgumentFirst,
+                argumentSecond = comparatorArgumentSecond,
+
+                instructionFunction = function,
+                instructionName = "If-Statement",
+                instructionCode = string.Empty, //function.functionCode.Substring(index, instructionEndIndex - index),
+                instructionParameters = null,
+
+                yes = new LuaFunction
+                {
+                    functionScript = null,
+                    functionName = "If-Statement-First",
+                    functionCode = firstCodeBlockCode,
+                },
+                no = string.IsNullOrEmpty(secondCodeBlockCode) ? null : new LuaFunction
+                {
+                    functionScript = null,
+                    functionName = "If-Statement-First",
+                    functionCode = secondCodeBlockCode,
+                }
+            });
+
+            report.found = true;
+
+            return report;
         }
 
         private static Comparator FindComparator(string statement)
@@ -243,68 +314,7 @@ namespace MunchenClient.Lua.Analyzer
             {
                 comparatorIndex = -1,
                 comparatorType = ComparatorType.ComparatorType_Unknown
-            }; ;
-        }
-
-        private static bool ExecuteComparatorCode(ComparatorType comparator, string argumentFirst, string argumentSecond)
-        {
-            switch (comparator)
-            {
-                case ComparatorType.ComparatorType_EqualTo:
-                    {
-                        return argumentFirst == argumentSecond;
-                    }
-
-                case ComparatorType.ComparatorType_NotEqualTo:
-                    {
-                        return argumentFirst != argumentSecond;
-                    }
-
-                case ComparatorType.ComparatorType_LessThan:
-                    {
-                        if (float.TryParse(argumentFirst, out float argumentFirstConverted) == false || float.TryParse(argumentSecond, out float argumentSecondConverted) == false)
-                        {
-                            return false;
-                        }
-
-                        return argumentFirstConverted < argumentSecondConverted;
-                    }
-
-                case ComparatorType.ComparatorType_MoreThan:
-                    {
-                        if (float.TryParse(argumentFirst, out float argumentFirstConverted) == false || float.TryParse(argumentSecond, out float argumentSecondConverted) == false)
-                        {
-                            return false;
-                        }
-
-                        return argumentFirstConverted > argumentSecondConverted;
-                    }
-
-                case ComparatorType.ComparatorType_MoreOrEqualThan:
-                    {
-                        if (float.TryParse(argumentFirst, out float argumentFirstConverted) == false || float.TryParse(argumentSecond, out float argumentSecondConverted) == false)
-                        {
-                            return false;
-                        }
-
-                        return argumentFirstConverted >= argumentSecondConverted;
-                    }
-
-                case ComparatorType.ComparatorType_LessOrEqualThan:
-                    {
-                        if (float.TryParse(argumentFirst, out float argumentFirstConverted) == false || float.TryParse(argumentSecond, out float argumentSecondConverted) == false)
-                        {
-                            return false;
-                        }
-
-                        return argumentFirstConverted <= argumentSecondConverted;
-                    }
-
-                default:
-                    {
-                        return false;
-                    }
-            }
+            };
         }
     }
 }
