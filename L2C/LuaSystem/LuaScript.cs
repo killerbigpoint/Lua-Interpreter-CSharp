@@ -8,7 +8,6 @@ namespace MunchenClient.Lua
         internal int scriptVersion;
         internal bool scriptAutoload;
         internal string scriptCode;
-        internal Dictionary<string, LuaFunction> scriptFunctions;
-        internal Dictionary<string, object> scriptTempVariables;
+        internal Dictionary<string, LuaFunction> scriptFunctions = new Dictionary<string, LuaFunction>();
     }
 }

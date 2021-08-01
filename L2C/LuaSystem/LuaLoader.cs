@@ -27,17 +27,16 @@ namespace MunchenClient.Lua
 
             //TODO: Integrity check - maybe some information regarding the lua
 
-            string scriptCode = File.ReadAllText(tempFile);
-
-            loadedLuas.Add(scriptName, new LuaScript
+            LuaScript script = new LuaScript
             {
                 scriptName = scriptName,
                 scriptVersion = 1,
                 scriptAutoload = false,
-                scriptCode = scriptCode,
+                scriptCode = File.ReadAllText(tempFile)
+            };
+            LuaAnalyzer.AnalyzeScript(script);
 
-                scriptFunctions = LuaAnalyzer.AnalyzeScript(scriptCode)
-            });
+            loadedLuas.Add(scriptName, script);
 
             Console.WriteLine($"LuaScript: {tempFile} successfully loaded");
 

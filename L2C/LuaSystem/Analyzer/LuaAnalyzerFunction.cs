@@ -10,16 +10,16 @@ namespace MunchenClient.Lua.Analyzer
     {
         private const string functionPrefix = "function";
 
-        internal static bool CheckForFunction(string script, int index, ref Dictionary<string, LuaFunction> list)
+        internal static bool CheckForFunctions(LuaScript script, int index)
         {
             //Make sure we got enough space for a potential function and won't hit the end of the script
-            if ((script.Length - index) < functionPrefix.Length)
+            if ((script.scriptCode.Length - index) < functionPrefix.Length)
             {
                 return false;
             }
 
             //Look ahead from the start position and see if we can find the 'function' keyword
-            int functionIndex = script.IndexOf(functionPrefix, index, functionPrefix.Length);
+            int functionIndex = script.scriptCode.IndexOf(functionPrefix, index, functionPrefix.Length);
 
             if (functionIndex == -1)
             {
@@ -27,7 +27,7 @@ namespace MunchenClient.Lua.Analyzer
             }
 
             //Check if our function has an end
-            int functionEndIndex = script.IndexOf(')', functionIndex);
+            int functionEndIndex = script.scriptCode.IndexOf(')', functionIndex);
 
             if (functionEndIndex == -1)
             {
@@ -37,7 +37,7 @@ namespace MunchenClient.Lua.Analyzer
             functionEndIndex++;
 
             //Make sure our function is valid by checking for brackets
-            int bracketIndexStart = script.IndexOf('{', functionEndIndex);
+            int bracketIndexStart = script.scriptCode.IndexOf('{', functionEndIndex);
 
             if (bracketIndexStart == -1)
             {
@@ -49,18 +49,18 @@ namespace MunchenClient.Lua.Analyzer
 
             while (bracketDifference >= 1)
             {
-                if (script[functionCurrentIndex] == '{' && functionCurrentIndex != bracketIndexStart)
+                if (script.scriptCode[functionCurrentIndex] == '{' && functionCurrentIndex != bracketIndexStart)
                 {
                     bracketDifference++;
                 }
-                else if (script[functionCurrentIndex] == '}')
+                else if (script.scriptCode[functionCurrentIndex] == '}')
                 {
                     bracketDifference--;
                 }
 
                 functionCurrentIndex++;
 
-                if (functionCurrentIndex > (script.Length - 1))
+                if (functionCurrentIndex > (script.scriptCode.Length - 1))
                 {
                     return false;
                 }
@@ -69,7 +69,7 @@ namespace MunchenClient.Lua.Analyzer
             int bracketIndexEnd = functionCurrentIndex;
 
             //Finish off by adding the function to the collection
-            string functionCode = script.Substring(bracketIndexStart + 1, bracketIndexEnd - bracketIndexStart - 2).Trim();
+            string functionCode = script.scriptCode.Substring(bracketIndexStart + 1, bracketIndexEnd - bracketIndexStart - 2).Trim();
 
             if (bracketIndexEnd == -1 || bracketIndexStart > bracketIndexEnd)
             {
@@ -77,20 +77,20 @@ namespace MunchenClient.Lua.Analyzer
             }
 
             //Make sure this function is actually valid by checking if everything actually belongs to it
-            if (IsFunctionValid(script, functionEndIndex, bracketIndexStart, bracketIndexEnd) == false)
+            if (IsFunctionValid(script.scriptCode, functionEndIndex, bracketIndexStart, bracketIndexEnd) == false)
             {
                 return false;
             }
 
-            string functionName = script.Substring(functionIndex, functionEndIndex - functionIndex - 2);
+            string functionName = script.scriptCode.Substring(functionIndex, functionEndIndex - functionIndex - 2);
 
             //Make sure we ain't finding duplicated functions
-            if (list.ContainsKey(functionName) == true)
+            if (script.scriptFunctions.ContainsKey(functionName) == true)
             {
                 return false;
             }
 
-            list.Add(functionName, new LuaFunction
+            script.scriptFunctions.Add(functionName, new LuaFunction
             {
                 functionName = functionName,
                 functionCode = functionCode

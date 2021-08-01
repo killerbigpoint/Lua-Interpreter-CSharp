@@ -8,16 +8,19 @@ namespace MunchenClient.Lua.Analyzer
 {
     internal class LuaAnalyzer
     {
-        internal static Dictionary<string, LuaFunction> AnalyzeScript(string script)
+        internal static void AnalyzeScript(LuaScript script)
         {
-            Dictionary<string, LuaFunction> functions = new Dictionary<string, LuaFunction>();
-
-            for (int i = 0; i < script.Length; i++)
+            //Part 1 - Analyze Functions
+            for (int i = 0; i < script.scriptCode.Length; i++)
             {
-                LuaAnalyzerFunction.CheckForFunction(script, i, ref functions);
+                LuaAnalyzerFunction.CheckForFunctions(script, i);
             }
 
-            return functions;
+            //Part 2 - Analyze Instructions
+            for (int i = 0; i < script.scriptFunctions.Count(); i++)
+            {
+                LuaAnalyzerInstruction.CheckForInstructions(script.scriptFunctions.ElementAt(i).Value);
+            }
         }
     }
 }
