@@ -23,7 +23,7 @@ namespace MunchenClient.Lua.Instructions
         internal ComparatorType comparatorType;
     }
 
-    internal class LuaInstructionIfStatement : ILuaInstruction
+    internal class LuaInstructionIfStatement : LuaInstruction
     {
         internal Comparator argumentComparator;
         internal string argumentFirst;

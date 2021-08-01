@@ -14,7 +14,10 @@ namespace MunchenClient.Lua.Analyzer
     {
         internal static bool CheckForInstructions(LuaFunction function)
         {
-            Console.WriteLine("Analyze Script: " + function.functionCode);
+            if(function == null)
+            {
+                return false;
+            }
 
             for (int i = 0; i < function.functionCode.Length; i++)
             {
@@ -157,8 +160,6 @@ namespace MunchenClient.Lua.Analyzer
 
             string statement = function.functionCode.Substring(instructionParameterStart + 1, instructionParameterEnd - instructionParameterStart - 1);
 
-            Console.WriteLine("Statement: " + statement);
-
             Comparator comparator = FindComparator(statement);
 
             if (comparator.comparatorType == ComparatorType.ComparatorType_Unknown)
@@ -168,13 +169,8 @@ namespace MunchenClient.Lua.Analyzer
                 return report;
             }
 
-            Console.WriteLine("Comparator found at index: " + comparator.comparatorIndex);
-
             string comparatorArgumentFirst = statement.Substring(0, comparator.comparatorIndex).Trim();
             string comparatorArgumentSecond = statement.Substring(statement.IndexOf(" ", comparator.comparatorIndex)).Trim();
-
-            Console.WriteLine("First Argument: " + comparatorArgumentFirst);
-            Console.WriteLine("Second Argument: " + comparatorArgumentSecond);
 
             int firstCodeBlockIndexStart = function.functionCode.IndexOf("{", instructionParameterEnd);
             int firstCodeBlockIndexEnd = function.functionCode.IndexOf("}", firstCodeBlockIndexStart);
@@ -184,6 +180,8 @@ namespace MunchenClient.Lua.Analyzer
                 return report;
             }
 
+            report.skipAhead = firstCodeBlockIndexEnd - index;
+
             string firstCodeBlockCode = function.functionCode.Substring(firstCodeBlockIndexStart + 1, firstCodeBlockIndexEnd - firstCodeBlockIndexStart - 1);
             string secondCodeBlockCode = string.Empty;
 
@@ -191,21 +189,18 @@ namespace MunchenClient.Lua.Analyzer
 
             if (elseStatementIndex != -1)
             {
-                Console.WriteLine("Found 'Else' statement");
-
                 int secondCodeBlockIndexStart = function.functionCode.IndexOf("{", elseStatementIndex);
                 int secondCodeBlockIndexEnd = function.functionCode.IndexOf("}", secondCodeBlockIndexStart);
 
                 if (secondCodeBlockIndexStart != -1 && secondCodeBlockIndexEnd != -1)
                 {
                     secondCodeBlockCode = function.functionCode.Substring(secondCodeBlockIndexStart + 1, secondCodeBlockIndexEnd - secondCodeBlockIndexStart - 1);
+
+                    report.skipAhead = secondCodeBlockIndexEnd - index;
                 }
             }
 
-            Console.WriteLine("First Code: " + firstCodeBlockCode);
-            Console.WriteLine("Second Code: " + secondCodeBlockCode);
-
-            function.functionExecutionList.Add(new LuaInstructionIfStatement
+            LuaInstructionIfStatement instruction = new LuaInstructionIfStatement
             {
                 argumentComparator = comparator,
                 argumentFirst = comparatorArgumentFirst,
@@ -213,22 +208,27 @@ namespace MunchenClient.Lua.Analyzer
 
                 instructionFunction = function,
                 instructionName = "If-Statement",
-                instructionCode = string.Empty, //function.functionCode.Substring(index, instructionEndIndex - index),
+                instructionCode = function.functionCode.Substring(index, report.skipAhead + 1),
                 instructionParameters = null,
 
                 yes = new LuaFunction
                 {
-                    functionScript = null,
+                    functionParent = function,
                     functionName = "If-Statement-First",
                     functionCode = firstCodeBlockCode,
                 },
                 no = string.IsNullOrEmpty(secondCodeBlockCode) ? null : new LuaFunction
                 {
-                    functionScript = null,
-                    functionName = "If-Statement-First",
+                    functionParent = function,
+                    functionName = "If-Statement-Second",
                     functionCode = secondCodeBlockCode,
                 }
-            });
+            };
+
+            function.functionExecutionList.Add(instruction);
+
+            CheckForInstructions(instruction.yes);
+            CheckForInstructions(instruction.no);
 
             report.found = true;
 

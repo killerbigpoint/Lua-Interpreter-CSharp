@@ -92,7 +92,7 @@ namespace MunchenClient.Lua.Analyzer
 
             script.scriptFunctions.Add(functionName, new LuaFunction
             {
-                functionScript = script,
+                functionParent = script,
                 functionName = functionName,
                 functionCode = functionCode
             });

@@ -2,7 +2,7 @@
 
 namespace MunchenClient.Lua.Instructions
 {
-    internal class LuaInstructionInternal : ILuaInstruction
+    internal class LuaInstructionInternal : LuaInstruction
     {
         internal override void ExecuteInstruction()
         {

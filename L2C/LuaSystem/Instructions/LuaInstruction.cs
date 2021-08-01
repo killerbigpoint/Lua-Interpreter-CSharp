@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MunchenClient.Lua.Instructions
 {
-    internal abstract class ILuaInstruction
+    internal abstract class LuaInstruction
     {
         internal LuaFunction instructionFunction;
         internal string instructionName;

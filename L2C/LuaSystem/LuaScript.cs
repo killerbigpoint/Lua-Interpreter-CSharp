@@ -2,14 +2,11 @@
 
 namespace MunchenClient.Lua
 {
-    internal class LuaScript
+    internal class LuaScript : LuaCodeExecutor
     {
         internal string scriptName;
         internal int scriptVersion;
         internal bool scriptAutoload;
         internal string scriptCode;
-
-        internal readonly Dictionary<string, object> scriptGlobalVariables = new Dictionary<string, object>();
-        internal readonly Dictionary<string, LuaFunction> scriptFunctions = new Dictionary<string, LuaFunction>();
     }
 }

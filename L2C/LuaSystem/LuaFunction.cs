@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace MunchenClient.Lua
 {
-    internal class LuaFunction
+    internal class LuaFunction : LuaCodeExecutor
     {
-        internal LuaScript functionScript;
+        internal LuaCodeExecutor functionParent;
         internal string functionName;
         internal string functionCode;
 
         internal readonly Dictionary<string, object> functionTempVariables = new Dictionary<string, object>();
-        internal readonly List<ILuaInstruction> functionExecutionList = new List<ILuaInstruction>();
+        internal readonly List<LuaInstruction> functionExecutionList = new List<LuaInstruction>();
 
         internal object GetVariable(string variableName)
         {
@@ -19,9 +19,9 @@ namespace MunchenClient.Lua
                 return functionTempVariables[variableName];
             }
 
-            if(functionScript.scriptGlobalVariables.ContainsKey(variableName) == true)
+            if(functionParent.scriptGlobalVariables.ContainsKey(variableName) == true)
             {
-                return functionScript.scriptGlobalVariables[variableName];
+                return functionParent.scriptGlobalVariables[variableName];
             }
 
             return null;
