@@ -53,39 +53,36 @@ namespace MunchenClient.Lua.Analyzer
 
             string instructionName = function.functionCode.Substring(index, instructionParameterStart - index);
 
-            if (LuaWrapper.InternalFunctionExists(instructionName) == true)
+            if (LuaWrapper.InternalFunctionExists(instructionName) == false)
             {
-                if (index > 1)
-                {
-                    int commentedOutIndex = function.functionCode.IndexOf("//", index - 2, 2);
-
-                    if (commentedOutIndex != -1)
-                    {
-                        return false;
-                    }
-                }
-
-                string instructionParameters = function.functionCode.Substring(instructionParameterStart + 1, instructionParameterEnd - instructionParameterStart - 1);
-                List<object> parameters = new List<object>();
-
-                foreach (string parameter in instructionParameters.Split(','))
-                {
-                    parameters.Add(DetermineParamterType(parameter.Trim()));
-                }
-
-                string instructionCode = function.functionCode.Substring(index, instructionEndIndex - index);
-
-                function.functionExecutionList.Add(new LuaInstructionInternal
-                {
-                    instructionName = instructionName,
-                    instructionCode = instructionCode,
-                    instructionParameters = parameters.ToArray()
-                });
-
-                return true;
+                return false;
             }
 
-            return false;
+            if (index > 1)
+            {
+                int commentedOutIndex = function.functionCode.IndexOf("//", index - 2, 2);
+
+                if (commentedOutIndex != -1)
+                {
+                    return false;
+                }
+            }
+
+            List<object> parameters = new List<object>();
+
+            foreach (string parameter in function.functionCode.Substring(instructionParameterStart + 1, instructionParameterEnd - instructionParameterStart - 1).Split(','))
+            {
+                parameters.Add(DetermineParamterType(parameter.Trim()));
+            }
+
+            function.functionExecutionList.Add(new LuaInstructionInternal
+            {
+                instructionName = instructionName,
+                instructionCode = function.functionCode.Substring(index, instructionEndIndex - index),
+                instructionParameters = parameters.ToArray()
+            });
+
+            return true;
         }
 
         private static object DetermineParamterType(string parameter)
