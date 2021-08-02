@@ -1,7 +1,6 @@
-﻿using MunchenClient.Lua;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -65,9 +64,9 @@ namespace MunchenClient.Lua.Analyzer
 
             string variableName = script.Substring(typeLength, setterIndex).Trim();
 
-            Console.WriteLine("Variable EndIndex" + variableEnd);
-            Console.WriteLine("Variable SetterIndex" + setterIndex);
-            Console.WriteLine("Variable Name" + variableName);
+            Console.WriteLine("Variable EndIndex: " + variableEnd);
+            Console.WriteLine("Variable SetterIndex: " + setterIndex);
+            Console.WriteLine("Variable Name: " + variableName);
 
             return true;
         }
