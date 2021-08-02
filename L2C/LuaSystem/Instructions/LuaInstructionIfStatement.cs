@@ -37,14 +37,10 @@ namespace MunchenClient.Lua.Instructions
             if(ExecuteComparatorCode(argumentComparator.comparatorType, argumentFirst, argumentSecond) == true)
             {
                 codeSectionFirst.ExecuteFunction();
-
-                Console.WriteLine("Executed First function: " + codeSectionFirst.functionCode);
             }
             else
             {
                 codeSectionSecond.ExecuteFunction();
-
-                Console.WriteLine("Executed Second function: " + codeSectionSecond.functionCode);
             }
         }
 

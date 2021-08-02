@@ -179,7 +179,7 @@ namespace MunchenClient.Lua.Analyzer
             string comparatorArgumentSecond = statement.Substring(statement.IndexOf(" ", comparator.comparatorIndex)).Trim();
 
             int firstCodeBlockIndexStart = function.functionCode.IndexOf("{", instructionParameterEnd);
-            int firstCodeBlockIndexEnd = LuaAnalyzer.FindCodeSectionEnd(function.functionCode, firstCodeBlockIndexStart); //function.functionCode.IndexOf("}", firstCodeBlockIndexStart);
+            int firstCodeBlockIndexEnd = LuaAnalyzer.FindCodeSectionEnd(function.functionCode, firstCodeBlockIndexStart);
 
             if (firstCodeBlockIndexStart == -1 || firstCodeBlockIndexEnd == -1)
             {
@@ -196,7 +196,7 @@ namespace MunchenClient.Lua.Analyzer
             if (elseStatementIndex != -1)
             {
                 int secondCodeBlockIndexStart = function.functionCode.IndexOf("{", elseStatementIndex);
-                int secondCodeBlockIndexEnd = LuaAnalyzer.FindCodeSectionEnd(function.functionCode, secondCodeBlockIndexStart); //function.functionCode.IndexOf("}", secondCodeBlockIndexStart);
+                int secondCodeBlockIndexEnd = LuaAnalyzer.FindCodeSectionEnd(function.functionCode, secondCodeBlockIndexStart);
 
                 if (secondCodeBlockIndexStart != -1 && secondCodeBlockIndexEnd != -1)
                 {
