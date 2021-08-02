@@ -16,7 +16,13 @@ namespace MunchenClient.Lua.Analyzer
                 LuaAnalyzerFunction.CheckForFunctions(script, i);
             }
 
-            //Part 2 - Analyze Instructions
+            //Part 2 - Analyze Global Variables
+            for (int i = 0; i < script.scriptCode.Length; i++)
+            {
+                LuaAnalyzerVariable.CheckForVariables(script, i);
+            }
+
+            //Part 3 - Analyze Instructions
             for (int i = 0; i < script.scriptFunctions.Count(); i++)
             {
                 LuaAnalyzerInstruction.CheckForInstructions(script.scriptFunctions.ElementAt(i).Value);

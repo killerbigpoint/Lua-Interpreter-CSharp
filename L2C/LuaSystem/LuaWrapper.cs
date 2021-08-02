@@ -96,8 +96,6 @@ namespace MunchenClient.Lua
 
             callbacks[functionName].Add(internalFunctionParameterCount, new FastMethodInfo(internalFunction));
 
-            Console.WriteLine($"Registered callback: {functionName} | {internalFunctionParameterCount}");
-
             return true;
         }
     }

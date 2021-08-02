@@ -53,7 +53,7 @@ namespace MunchenClient.Lua.Analyzer
                 skipAhead = 0
             };
 
-            //Make sure we got enough space for a potential function and won't hit the end of the script
+            //Make sure we got enough space for a potential instruction and won't hit the end of the script
             if ((function.functionCode.Length - index) < 8)
             {
                 return report;

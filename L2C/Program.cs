@@ -27,8 +27,6 @@ namespace L2C
             stopwatch.Start();
 
             LuaWrapper.RegisterFunctionCallback("console.log", typeof(Program), nameof(OutputToConsole));
-            LuaWrapper.RegisterFunctionCallback("console.debug", typeof(Program), nameof(OutputToConsole));
-            LuaWrapper.RegisterFunctionCallback("console.debug", typeof(Program), nameof(OutputToConsole));
             LuaWrapper.RegisterFunctionCallback("console.boolean", typeof(Program), nameof(OutputBoolean));
 
             stopwatch.Stop();

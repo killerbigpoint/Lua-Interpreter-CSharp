@@ -47,6 +47,7 @@
     <Compile Include="LuaSystem\Analyzer\LuaAnalyzerFunction.cs" />
     <Compile Include="LuaSystem\Analyzer\LuaAnalyzerInstruction.cs" />
     <Compile Include="FastMethodInfo.cs" />
+    <Compile Include="LuaSystem\Analyzer\LuaAnalyzerVariable.cs" />
     <Compile Include="LuaSystem\Instructions\LuaInstructionIfStatement.cs" />
     <Compile Include="LuaSystem\Analyzer\LuaAnalyzer.cs" />
     <Compile Include="LuaSystem\Instructions\LuaInstructionInternal.cs" />
