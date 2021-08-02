@@ -50,6 +50,7 @@
     <Compile Include="LuaSystem\Instructions\LuaInstructionIfStatement.cs" />
     <Compile Include="LuaSystem\Analyzer\LuaAnalyzer.cs" />
     <Compile Include="LuaSystem\Instructions\LuaInstructionInternal.cs" />
+    <Compile Include="LuaSystem\Instructions\LuaInstructionVariable.cs" />
     <Compile Include="LuaSystem\LuaCore.cs" />
     <Compile Include="LuaSystem\LuaFunction.cs" />
     <Compile Include="LuaSystem\Instructions\LuaInstruction.cs" />

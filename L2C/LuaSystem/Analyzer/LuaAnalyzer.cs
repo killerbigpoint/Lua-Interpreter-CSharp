@@ -22,5 +22,32 @@ namespace MunchenClient.Lua.Analyzer
                 LuaAnalyzerInstruction.CheckForInstructions(script.scriptFunctions.ElementAt(i).Value);
             }
         }
+
+        internal static int FindCodeSectionEnd(string script, int startIndex)
+        {
+            int functionCurrentIndex = startIndex;
+            int bracketDifference = 1;
+
+            while (bracketDifference >= 1)
+            {
+                if (script[functionCurrentIndex] == '{' && functionCurrentIndex != startIndex)
+                {
+                    bracketDifference++;
+                }
+                else if (script[functionCurrentIndex] == '}')
+                {
+                    bracketDifference--;
+                }
+
+                functionCurrentIndex++;
+
+                if (functionCurrentIndex > (script.Length - 1))
+                {
+                    return -1;
+                }
+            }
+
+            return functionCurrentIndex - 1;
+        }
     }
 }

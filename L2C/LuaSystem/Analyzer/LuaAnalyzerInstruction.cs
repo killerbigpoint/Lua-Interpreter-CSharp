@@ -173,9 +173,9 @@ namespace MunchenClient.Lua.Analyzer
             string comparatorArgumentSecond = statement.Substring(statement.IndexOf(" ", comparator.comparatorIndex)).Trim();
 
             int firstCodeBlockIndexStart = function.functionCode.IndexOf("{", instructionParameterEnd);
-            int firstCodeBlockIndexEnd = function.functionCode.IndexOf("}", firstCodeBlockIndexStart);
+            int firstCodeBlockIndexEnd = LuaAnalyzer.FindCodeSectionEnd(function.functionCode, firstCodeBlockIndexStart); //function.functionCode.IndexOf("}", firstCodeBlockIndexStart);
 
-            if(firstCodeBlockIndexStart == -1 || firstCodeBlockIndexEnd == -1)
+            if (firstCodeBlockIndexStart == -1 || firstCodeBlockIndexEnd == -1)
             {
                 return report;
             }
@@ -190,7 +190,7 @@ namespace MunchenClient.Lua.Analyzer
             if (elseStatementIndex != -1)
             {
                 int secondCodeBlockIndexStart = function.functionCode.IndexOf("{", elseStatementIndex);
-                int secondCodeBlockIndexEnd = function.functionCode.IndexOf("}", secondCodeBlockIndexStart);
+                int secondCodeBlockIndexEnd = LuaAnalyzer.FindCodeSectionEnd(function.functionCode, secondCodeBlockIndexStart); //function.functionCode.IndexOf("}", secondCodeBlockIndexStart);
 
                 if (secondCodeBlockIndexStart != -1 && secondCodeBlockIndexEnd != -1)
                 {
@@ -211,13 +211,13 @@ namespace MunchenClient.Lua.Analyzer
                 instructionCode = function.functionCode.Substring(index, report.skipAhead + 1),
                 instructionParameters = null,
 
-                yes = new LuaFunction
+                codeSectionFirst = new LuaFunction
                 {
                     functionParent = function,
                     functionName = "If-Statement-First",
                     functionCode = firstCodeBlockCode,
                 },
-                no = string.IsNullOrEmpty(secondCodeBlockCode) ? null : new LuaFunction
+                codeSectionSecond = string.IsNullOrEmpty(secondCodeBlockCode) ? null : new LuaFunction
                 {
                     functionParent = function,
                     functionName = "If-Statement-Second",
@@ -227,8 +227,8 @@ namespace MunchenClient.Lua.Analyzer
 
             function.functionExecutionList.Add(instruction);
 
-            CheckForInstructions(instruction.yes);
-            CheckForInstructions(instruction.no);
+            CheckForInstructions(instruction.codeSectionFirst);
+            CheckForInstructions(instruction.codeSectionSecond);
 
             report.found = true;
 

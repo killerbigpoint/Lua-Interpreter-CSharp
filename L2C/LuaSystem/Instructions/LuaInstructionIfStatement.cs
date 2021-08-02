@@ -29,12 +29,23 @@ namespace MunchenClient.Lua.Instructions
         internal string argumentFirst;
         internal string argumentSecond;
 
-        internal LuaFunction yes;
-        internal LuaFunction no;
+        internal LuaFunction codeSectionFirst;
+        internal LuaFunction codeSectionSecond;
 
         internal override void ExecuteInstruction()
         {
-            
+            if(ExecuteComparatorCode(argumentComparator.comparatorType, argumentFirst, argumentSecond) == true)
+            {
+                codeSectionFirst.ExecuteFunction();
+
+                Console.WriteLine("Executed First function: " + codeSectionFirst.functionCode);
+            }
+            else
+            {
+                codeSectionSecond.ExecuteFunction();
+
+                Console.WriteLine("Executed Second function: " + codeSectionSecond.functionCode);
+            }
         }
 
         private static bool ExecuteComparatorCode(ComparatorType comparator, string argumentFirst, string argumentSecond)

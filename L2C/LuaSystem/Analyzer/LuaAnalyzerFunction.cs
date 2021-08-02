@@ -44,29 +44,12 @@ namespace MunchenClient.Lua.Analyzer
                 return false;
             }
 
-            int functionCurrentIndex = bracketIndexStart;
-            int bracketDifference = 1;
+            int bracketIndexEnd = LuaAnalyzer.FindCodeSectionEnd(script.scriptCode, bracketIndexStart);
 
-            while (bracketDifference >= 1)
+            if (bracketIndexEnd == -1)
             {
-                if (script.scriptCode[functionCurrentIndex] == '{' && functionCurrentIndex != bracketIndexStart)
-                {
-                    bracketDifference++;
-                }
-                else if (script.scriptCode[functionCurrentIndex] == '}')
-                {
-                    bracketDifference--;
-                }
-
-                functionCurrentIndex++;
-
-                if (functionCurrentIndex > (script.scriptCode.Length - 1))
-                {
-                    return false;
-                }
+                return false;
             }
-
-            int bracketIndexEnd = functionCurrentIndex;
 
             //Finish off by adding the function to the collection
             string functionCode = script.scriptCode.Substring(bracketIndexStart + 1, bracketIndexEnd - bracketIndexStart - 2).Trim();
