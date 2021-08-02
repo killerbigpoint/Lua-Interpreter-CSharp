@@ -125,9 +125,15 @@ namespace MunchenClient.Lua.Analyzer
             {
                 return intParameter;
             }
-            else if (float.TryParse(nonStringParameter, out float floatParameter) == true)
+
+            if (float.TryParse(nonStringParameter, out float floatParameter) == true)
             {
                 return floatParameter;
+            }
+
+            if(bool.TryParse(nonStringParameter, out bool boolParameter) == true)
+            {
+                return boolParameter;
             }
 
             //TODO: Potentially add class types from the client here

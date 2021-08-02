@@ -15,6 +15,11 @@ namespace L2C
             Console.WriteLine($"OutputToConsole 2: {text} + {text2}");
         }
 
+        public static void OutputBoolean(bool boolean)
+        {
+            Console.WriteLine($"OutputBoolean: {boolean}");
+        }
+
         public static void Main(string[] args)
         {
             //LuaAPI
@@ -24,6 +29,7 @@ namespace L2C
             LuaWrapper.RegisterFunctionCallback("console.log", typeof(Program), nameof(OutputToConsole));
             LuaWrapper.RegisterFunctionCallback("console.debug", typeof(Program), nameof(OutputToConsole));
             LuaWrapper.RegisterFunctionCallback("console.debug", typeof(Program), nameof(OutputToConsole));
+            LuaWrapper.RegisterFunctionCallback("console.boolean", typeof(Program), nameof(OutputBoolean));
 
             stopwatch.Stop();
 
