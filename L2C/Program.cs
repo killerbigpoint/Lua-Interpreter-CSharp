@@ -17,20 +17,35 @@ namespace L2C
 
         public static void Main(string[] args)
         {
+            //LuaAPI
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
+
             LuaWrapper.RegisterFunctionCallback("console.log", typeof(Program), nameof(OutputToConsole));
             LuaWrapper.RegisterFunctionCallback("console.debug", typeof(Program), nameof(OutputToConsole));
             LuaWrapper.RegisterFunctionCallback("console.debug", typeof(Program), nameof(OutputToConsole));
 
-            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-            stopwatch.Start();
+            stopwatch.Stop();
+
+            //LuaLoad
+            System.Diagnostics.Stopwatch stopwatch2 = new System.Diagnostics.Stopwatch();
+            stopwatch2.Start();
 
             LuaScript hack = LuaLoader.LoadLua("hack");
 
-            stopwatch.Stop();
+            stopwatch2.Stop();
+
+            //LuaExecute
+            System.Diagnostics.Stopwatch stopwatch3 = new System.Diagnostics.Stopwatch();
+            stopwatch3.Start();
 
             LuaInterpreter.ExecuteFunction(hack, "OnUpdate");
 
-            Console.WriteLine($"Elapsed Time is {stopwatch.ElapsedTicks / 10000} ms");
+            stopwatch3.Stop();
+
+            Console.WriteLine($"API Load Time: {stopwatch.ElapsedMilliseconds} ms");
+            Console.WriteLine($"Lua Load Time: {stopwatch2.ElapsedMilliseconds} ms");
+            Console.WriteLine($"Lua Execute Time: {stopwatch3.ElapsedMilliseconds} ms");
 
             Console.ReadLine();
         }
