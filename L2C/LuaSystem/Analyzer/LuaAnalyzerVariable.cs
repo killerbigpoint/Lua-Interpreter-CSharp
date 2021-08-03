@@ -9,9 +9,9 @@ namespace MunchenClient.Lua.Analyzer
 {
     internal class LuaAnalyzerVariable
     {
-        private const int longestVariableType = 6;
+        internal const int longestVariableType = 6;
 
-        private static readonly Dictionary<string, Type> variableTypes = new Dictionary<string, Type>
+        internal static readonly Dictionary<string, Type> variableTypes = new Dictionary<string, Type>
         {
             { "byte", typeof(byte) },
             { "int", typeof(int) },
@@ -46,7 +46,7 @@ namespace MunchenClient.Lua.Analyzer
             return false;
         }
 
-        private static bool DetermineVariable(LuaScript script, string scriptCode, int typeLength)
+        internal static bool DetermineVariable(LuaScript script, string scriptCode, int typeLength)
         {
             int variableEnd = scriptCode.IndexOf(';');
 
@@ -68,14 +68,48 @@ namespace MunchenClient.Lua.Analyzer
             string variableValue = variableCode.Substring(setterIndex + 1, variableEnd - setterIndex - 1).Trim();
             string variableValueFixed = variableValue.Substring(0, variableValue.Length - 1);
 
-            if(script.executionVariables.ContainsKey(variableName) == true)
+            if(script.GetVariable(variableName) != null)
             {
                 return false;
             }
 
-            script.executionVariables.Add(variableName, LuaAnalyzer.DetermineParameterType(variableValueFixed));
+            script.InsertVariable(variableName, LuaAnalyzer.DetermineParameterType(variableValueFixed));
 
             Console.WriteLine("Registered Global Variable: " + variableName);
+
+            return true;
+        }
+
+        internal static bool DetermineVariable(LuaFunction function, string scriptCode, int typeLength)
+        {
+            int variableEnd = scriptCode.IndexOf(';');
+
+            if (variableEnd == -1)
+            {
+                return false;
+            }
+
+            string variableCode = scriptCode.Substring(typeLength, variableEnd);
+
+            int setterIndex = variableCode.IndexOf('=');
+
+            if (setterIndex == -1)
+            {
+                return false;
+            }
+
+            string variableName = variableCode.Substring(0, setterIndex).Trim();
+            string variableValue = variableCode.Substring(setterIndex + 1, variableEnd - setterIndex - 1).Trim();
+            string variableValueFixed = variableValue.Substring(0, variableValue.Length - 1);
+
+            if (function.GetVariable(variableName) != null)
+            {
+                return false;
+            }
+
+            function.InsertVariable(variableName, LuaAnalyzer.DetermineParameterType(variableValueFixed));
+
+            Console.WriteLine("Registered Local Variable: " + variableName + " under " + function.functionName);
 
             return true;
         }

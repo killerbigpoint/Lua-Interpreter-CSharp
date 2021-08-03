@@ -1,6 +1,8 @@
 ﻿using MunchenClient.Lua.Instructions;
 using System.Collections.Generic;
 using System;
+using System.Reflection;
+using System.Linq;
 
 namespace MunchenClient.Lua.Analyzer
 {
@@ -27,8 +29,6 @@ namespace MunchenClient.Lua.Analyzer
                 if (postAnalyze.found == true)
                 {
                     i += postAnalyze.skipAhead;
-
-                    continue;
                 }
 
                 //Check for internal instruction
@@ -37,9 +37,25 @@ namespace MunchenClient.Lua.Analyzer
                 if (postAnalyze.found == true)
                 {
                     i += postAnalyze.skipAhead;
-
-                    continue;
                 }
+
+                //Make sure we got enough space for a potential variable and won't hit the end of the script
+                /*if ((function.functionCode.Length - i) < LuaAnalyzerVariable.longestVariableType)
+                {
+                    return false;
+                }
+
+                string scriptCodeFixed = function.functionCode.Substring(i);
+
+                for (int j = 0; j < LuaAnalyzerVariable.variableTypes.Count; j++)
+                {
+                    if (scriptCodeFixed.StartsWith(LuaAnalyzerVariable.variableTypes.ElementAt(j).Key) == true)
+                    {
+                        LuaAnalyzerVariable.DetermineVariable(function, scriptCodeFixed, LuaAnalyzerVariable.variableTypes.ElementAt(j).Key.Length);
+
+                        break;
+                    }
+                }*/
             }
 
             return true;

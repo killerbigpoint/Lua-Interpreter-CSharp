@@ -10,8 +10,18 @@ namespace MunchenClient.Lua
     {
         internal LuaCodeExecutor executionParent;
 
-        internal readonly Dictionary<string, object> executionVariables = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> executionVariables = new Dictionary<string, object>();
         internal readonly Dictionary<string, LuaFunction> executionFunctions = new Dictionary<string, LuaFunction>();
+
+        internal void InsertVariable(string variableName, object variableValue)
+        {
+            if (executionVariables.ContainsKey(variableName) == true)
+            {
+                return;
+            }
+
+            executionVariables.Add(variableName, variableValue);
+        }
 
         internal object GetVariable(string variableName)
         {
