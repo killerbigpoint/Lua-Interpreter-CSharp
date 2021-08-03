@@ -11,7 +11,7 @@ namespace MunchenClient.Lua
 
         internal static LuaScript LoadLua(string scriptName)
         {
-            string tempFile = $"D:/{scriptName}.lua";
+            string tempFile = $"C:/{scriptName}.lua";
 
             if(loadedLuas.ContainsKey(scriptName) == true)
             {

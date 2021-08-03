@@ -21,8 +21,8 @@ namespace MunchenClient.Lua.Analyzer
 
             for (int i = 0; i < function.functionCode.Length; i++)
             {
-                //Check for internal instruction
-                InstructionAnalyzeReport postAnalyze = CheckForInternalInstruction(function, i);
+                //Check for 'if' statement
+                InstructionAnalyzeReport postAnalyze = CheckForIfStatement(function, i);
 
                 if (postAnalyze.found == true)
                 {
@@ -31,8 +31,8 @@ namespace MunchenClient.Lua.Analyzer
                     continue;
                 }
 
-                //Check for 'if' statement
-                postAnalyze = CheckForIfStatement(function, i);
+                //Check for internal instruction
+                postAnalyze = CheckForInternalInstruction(function, i);
 
                 if (postAnalyze.found == true)
                 {

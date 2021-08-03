@@ -47,7 +47,7 @@ namespace MunchenClient.Lua.Analyzer
 
                 functionCurrentIndex++;
 
-                if (functionCurrentIndex > (script.Length - 1))
+                if (functionCurrentIndex > script.Length)
                 {
                     return -1;
                 }
