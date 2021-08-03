@@ -37,7 +37,7 @@ namespace MunchenClient.Lua.Analyzer
             {
                 if (scriptCodeFixed.StartsWith(variableTypes.ElementAt(i).Key) == true)
                 {
-                    DetermineVariable(scriptCodeFixed, variableTypes.ElementAt(i).Key.Length);
+                    DetermineVariable(script, scriptCodeFixed, variableTypes.ElementAt(i).Key.Length);
 
                     break;
                 }
@@ -46,27 +46,36 @@ namespace MunchenClient.Lua.Analyzer
             return false;
         }
 
-        private static bool DetermineVariable(string script, int typeLength)
+        private static bool DetermineVariable(LuaScript script, string scriptCode, int typeLength)
         {
-            int variableEnd = script.IndexOf(';');
+            int variableEnd = scriptCode.IndexOf(';');
 
             if (variableEnd == -1)
             {
                 return false;
             }
 
-            int setterIndex = script.IndexOf('=', 0, variableEnd);
+            string variableCode = scriptCode.Substring(typeLength, variableEnd);
+
+            int setterIndex = variableCode.IndexOf('=');
 
             if(setterIndex == -1)
             {
                 return false;
             }
 
-            string variableName = script.Substring(typeLength, setterIndex).Trim();
+            string variableName = variableCode.Substring(0, setterIndex).Trim();
+            string variableValue = variableCode.Substring(setterIndex + 1, variableEnd - setterIndex - 1).Trim();
+            string variableValueFixed = variableValue.Substring(0, variableValue.Length - 1);
 
-            Console.WriteLine("Variable EndIndex: " + variableEnd);
-            Console.WriteLine("Variable SetterIndex: " + setterIndex);
-            Console.WriteLine("Variable Name: " + variableName);
+            if(script.scriptGlobalVariables.ContainsKey(variableName) == true)
+            {
+                return false;
+            }
+
+            script.scriptGlobalVariables.Add(variableName, LuaAnalyzer.DetermineParameterType(variableValueFixed));
+
+            Console.WriteLine("Registered Global Variable: " + variableName);
 
             return true;
         }

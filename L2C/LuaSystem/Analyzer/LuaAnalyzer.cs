@@ -13,16 +13,17 @@ namespace MunchenClient.Lua.Analyzer
             //Part 1 - Analyze Functions
             for (int i = 0; i < script.scriptCode.Length; i++)
             {
-                LuaAnalyzerFunction.CheckForFunctions(script, i);
-            }
+                FunctionAnalyzeReport report = LuaAnalyzerFunction.CheckForFunctions(script, i);
 
-            //Part 2 - Analyze Global Variables
-            for (int i = 0; i < script.scriptCode.Length; i++)
-            {
+                if(report.found == true)
+                {
+                    i += report.skipAhead;
+                }
+                
                 LuaAnalyzerVariable.CheckForVariables(script, i);
             }
 
-            //Part 3 - Analyze Instructions
+            //Part 2 - Analyze Instructions
             for (int i = 0; i < script.scriptFunctions.Count(); i++)
             {
                 LuaAnalyzerInstruction.CheckForInstructions(script.scriptFunctions.ElementAt(i).Value);
@@ -54,6 +55,35 @@ namespace MunchenClient.Lua.Analyzer
             }
 
             return functionCurrentIndex - 1;
+        }
+
+        internal static object DetermineParameterType(string parameter)
+        {
+            if (parameter[0] == '"' && parameter[parameter.Length - 1] == '"')
+            {
+                return parameter;
+            }
+
+            string nonStringParameter = parameter.Substring(0, parameter.Length - (parameter.EndsWith("f") ? 1 : 0));
+
+            if (int.TryParse(nonStringParameter, out int intParameter) == true)
+            {
+                return intParameter;
+            }
+
+            if (float.TryParse(nonStringParameter, out float floatParameter) == true)
+            {
+                return floatParameter;
+            }
+
+            if (bool.TryParse(nonStringParameter, out bool boolParameter) == true)
+            {
+                return boolParameter;
+            }
+
+            //TODO: Potentially add class types from the client here
+
+            return parameter;
         }
     }
 }

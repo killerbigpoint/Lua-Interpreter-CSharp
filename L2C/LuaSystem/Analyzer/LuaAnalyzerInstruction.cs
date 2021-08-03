@@ -95,7 +95,7 @@ namespace MunchenClient.Lua.Analyzer
 
             foreach (string parameter in function.functionCode.Substring(instructionParameterStart + 1, instructionParameterEnd - instructionParameterStart - 1).Split(','))
             {
-                parameters.Add(DetermineParamterType(parameter.Trim()));
+                parameters.Add(LuaAnalyzer.DetermineParameterType(parameter.Trim()));
             }
 
             function.functionExecutionList.Add(new LuaInstructionInternal
@@ -110,35 +110,6 @@ namespace MunchenClient.Lua.Analyzer
             report.skipAhead = instructionEndIndex - index;
 
             return report;
-        }
-
-        private static object DetermineParamterType(string parameter)
-        {
-            if (parameter[0] == '"' && parameter[parameter.Length - 1] == '"')
-            {
-                return parameter;
-            }
-
-            string nonStringParameter = parameter.Substring(0, parameter.Length - (parameter.EndsWith("f") ? 1 : 0));
-
-            if (int.TryParse(nonStringParameter, out int intParameter) == true)
-            {
-                return intParameter;
-            }
-
-            if (float.TryParse(nonStringParameter, out float floatParameter) == true)
-            {
-                return floatParameter;
-            }
-
-            if(bool.TryParse(nonStringParameter, out bool boolParameter) == true)
-            {
-                return boolParameter;
-            }
-
-            //TODO: Potentially add class types from the client here
-
-            return parameter;
         }
 
         private static InstructionAnalyzeReport CheckForIfStatement(LuaFunction function, int index)
