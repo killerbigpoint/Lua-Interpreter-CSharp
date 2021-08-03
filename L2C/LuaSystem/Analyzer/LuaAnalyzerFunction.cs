@@ -80,14 +80,14 @@ namespace MunchenClient.Lua.Analyzer
             string functionName = script.scriptCode.Substring(functionIndex, functionEndIndex - functionIndex - 2);
 
             //Make sure we ain't finding duplicated functions
-            if (script.scriptFunctions.ContainsKey(functionName) == true)
+            if (script.executionFunctions.ContainsKey(functionName) == true)
             {
                 return report;
             }
 
-            script.scriptFunctions.Add(functionName, new LuaFunction
+            script.executionFunctions.Add(functionName, new LuaFunction
             {
-                functionParent = script,
+                executionParent = script,
                 functionName = functionName,
                 functionCode = functionCode
             });

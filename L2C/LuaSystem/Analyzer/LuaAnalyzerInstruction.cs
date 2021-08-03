@@ -190,13 +190,13 @@ namespace MunchenClient.Lua.Analyzer
 
                 codeSectionFirst = new LuaFunction
                 {
-                    functionParent = function,
+                    executionParent = function,
                     functionName = "If-Statement-First",
                     functionCode = firstCodeBlockCode,
                 },
                 codeSectionSecond = string.IsNullOrEmpty(secondCodeBlockCode) ? null : new LuaFunction
                 {
-                    functionParent = function,
+                    executionParent = function,
                     functionName = "If-Statement-Second",
                     functionCode = secondCodeBlockCode,
                 }

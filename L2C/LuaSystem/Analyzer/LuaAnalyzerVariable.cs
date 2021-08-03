@@ -68,12 +68,12 @@ namespace MunchenClient.Lua.Analyzer
             string variableValue = variableCode.Substring(setterIndex + 1, variableEnd - setterIndex - 1).Trim();
             string variableValueFixed = variableValue.Substring(0, variableValue.Length - 1);
 
-            if(script.scriptGlobalVariables.ContainsKey(variableName) == true)
+            if(script.executionVariables.ContainsKey(variableName) == true)
             {
                 return false;
             }
 
-            script.scriptGlobalVariables.Add(variableName, LuaAnalyzer.DetermineParameterType(variableValueFixed));
+            script.executionVariables.Add(variableName, LuaAnalyzer.DetermineParameterType(variableValueFixed));
 
             Console.WriteLine("Registered Global Variable: " + variableName);
 

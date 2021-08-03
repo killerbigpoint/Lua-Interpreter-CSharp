@@ -24,9 +24,9 @@ namespace MunchenClient.Lua.Analyzer
             }
 
             //Part 2 - Analyze Instructions
-            for (int i = 0; i < script.scriptFunctions.Count(); i++)
+            for (int i = 0; i < script.executionFunctions.Count(); i++)
             {
-                LuaAnalyzerInstruction.CheckForInstructions(script.scriptFunctions.ElementAt(i).Value);
+                LuaAnalyzerInstruction.CheckForInstructions(script.executionFunctions.ElementAt(i).Value);
             }
         }
 

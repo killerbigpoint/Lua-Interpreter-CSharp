@@ -17,14 +17,14 @@ namespace MunchenClient.Lua
 
             string functionNameFixed = $"function {functionName}";
 
-            if (script.scriptFunctions.ContainsKey(functionNameFixed) == false)
+            if (script.executionFunctions.ContainsKey(functionNameFixed) == false)
             {
                 Console.WriteLine("Failed to execute function due to script not containing it");
 
                 return false;
             }
 
-            return ExecuteFunction(script.scriptFunctions[functionNameFixed]);
+            return ExecuteFunction(script.executionFunctions[functionNameFixed]);
         }
 
         internal static bool ExecuteFunction(LuaFunction function)
