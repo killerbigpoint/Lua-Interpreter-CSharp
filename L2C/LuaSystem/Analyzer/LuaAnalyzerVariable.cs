@@ -79,7 +79,7 @@ namespace MunchenClient.Lua.Analyzer
             }
 
             string variableName = variableCode.Substring(0, setterIndex).Trim();
-            string variableValue = variableCode.Substring(setterIndex, variableCode.Length - setterIndex).Trim();
+            string variableValue = variableCode.Substring(setterIndex + 1, variableCode.Length - setterIndex - 1).Trim();
 
             if (function.GetVariable(variableName) != null)
             {
