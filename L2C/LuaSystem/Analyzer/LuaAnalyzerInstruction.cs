@@ -49,7 +49,12 @@ namespace MunchenClient.Lua.Analyzer
 
                 if (scriptCodeFixed.StartsWith("var") == true)
                 {
-                    LuaAnalyzerVariable.DetermineVariable(function, scriptCodeFixed);
+                    VariableAnalyzeReport report = LuaAnalyzerVariable.DetermineVariable(function, scriptCodeFixed);
+
+                    if(report.found == true)
+                    {
+                        i += report.skipAhead;
+                    }
                 }
             }
 

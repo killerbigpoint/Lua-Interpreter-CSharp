@@ -47,9 +47,18 @@ namespace L2C
 
             stopwatch3.Stop();
 
+            //LuaExecute 2
+            System.Diagnostics.Stopwatch stopwatch4 = new System.Diagnostics.Stopwatch();
+            stopwatch4.Start();
+
+            LuaInterpreter.ExecuteFunction(hack, "OnUpdate");
+
+            stopwatch4.Stop();
+
             Console.WriteLine($"API Load Time: {stopwatch.ElapsedMilliseconds} ms");
             Console.WriteLine($"Lua Load Time: {stopwatch2.ElapsedMilliseconds} ms");
             Console.WriteLine($"Lua Execute Time: {stopwatch3.ElapsedMilliseconds} ms");
+            Console.WriteLine($"Lua Execute Time 2: {stopwatch4.ElapsedMilliseconds} ms");
 
             Console.ReadLine();
         }

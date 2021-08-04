@@ -13,14 +13,19 @@ namespace MunchenClient.Lua.Analyzer
             //Part 1 - Analyze Functions
             for (int i = 0; i < script.scriptCode.Length; i++)
             {
-                FunctionAnalyzeReport report = LuaAnalyzerFunction.CheckForFunctions(script, i);
+                FunctionAnalyzeReport functionReport = LuaAnalyzerFunction.CheckForFunctions(script, i);
 
-                if(report.found == true)
+                if(functionReport.found == true)
                 {
-                    i += report.skipAhead;
+                    i += functionReport.skipAhead;
                 }
-                
-                LuaAnalyzerVariable.CheckForVariables(script, i);
+
+                VariableAnalyzeReport variableReport = LuaAnalyzerVariable.CheckForVariables(script, i);
+
+                if (variableReport.found == true)
+                {
+                    i += variableReport.skipAhead;
+                }
             }
 
             //Part 2 - Analyze Instructions
