@@ -59,6 +59,11 @@ namespace MunchenClient.Lua.Analyzer
 
         internal static object DetermineParameterType(string parameter)
         {
+            /*if(string.IsNullOrEmpty(parameter) == true)
+            {
+                return null;
+            }*/
+
             if (parameter[0] == '"' && parameter[parameter.Length - 1] == '"')
             {
                 return parameter;

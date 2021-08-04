@@ -40,22 +40,17 @@ namespace MunchenClient.Lua.Analyzer
                 }
 
                 //Make sure we got enough space for a potential variable and won't hit the end of the script
-                /*if ((function.functionCode.Length - i) < LuaAnalyzerVariable.longestVariableType)
+                if ((function.functionCode.Length - i) < 3)
                 {
                     return false;
                 }
 
                 string scriptCodeFixed = function.functionCode.Substring(i);
 
-                for (int j = 0; j < LuaAnalyzerVariable.variableTypes.Count; j++)
+                if (scriptCodeFixed.StartsWith("var") == true)
                 {
-                    if (scriptCodeFixed.StartsWith(LuaAnalyzerVariable.variableTypes.ElementAt(j).Key) == true)
-                    {
-                        LuaAnalyzerVariable.DetermineVariable(function, scriptCodeFixed, LuaAnalyzerVariable.variableTypes.ElementAt(j).Key.Length);
-
-                        break;
-                    }
-                }*/
+                    LuaAnalyzerVariable.DetermineVariable(function, scriptCodeFixed);
+                }
             }
 
             return true;
