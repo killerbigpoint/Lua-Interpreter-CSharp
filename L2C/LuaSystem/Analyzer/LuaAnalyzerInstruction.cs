@@ -39,26 +39,67 @@ namespace MunchenClient.Lua.Analyzer
                     i += postAnalyze.skipAhead;
                 }
 
-                //Make sure we got enough space for a potential variable and won't hit the end of the script
-                if ((function.functionCode.Length - i) < 3)
+                //Check for variable instantiator
+                VariableAnalyzeReport report = CheckForVariableInstantiator(function, i);
+
+                if (report.found == true)
                 {
-                    return false;
+                    i += report.skipAhead;
                 }
 
-                string scriptCodeFixed = function.functionCode.Substring(i);
+                //Check for variable manipulator
+                report = CheckForVariableManipulator(function, i);
 
-                if (scriptCodeFixed.StartsWith("var") == true)
+                if (report.found == true)
                 {
-                    VariableAnalyzeReport report = LuaAnalyzerVariable.DetermineVariable(function, scriptCodeFixed);
-
-                    if(report.found == true)
-                    {
-                        i += report.skipAhead;
-                    }
+                    i += report.skipAhead;
                 }
             }
 
             return true;
+        }
+
+        private static VariableAnalyzeReport CheckForVariableManipulator(LuaFunction function, int index)
+        {
+            VariableAnalyzeReport report = new VariableAnalyzeReport
+            {
+                found = false,
+                skipAhead = 0
+            };
+
+            string scriptCodeFixed = function.functionCode.Substring(index);
+
+            foreach(var variable in function.)
+
+            if (scriptCodeFixed.StartsWith("var") == true)
+            {
+                report = LuaAnalyzerVariable.DetermineVariable(function, scriptCodeFixed);
+            }
+
+            return report;
+        }
+
+        private static VariableAnalyzeReport CheckForVariableInstantiator(LuaFunction function, int index)
+        {
+            VariableAnalyzeReport report = new VariableAnalyzeReport
+            {
+                found = false,
+                skipAhead = 0
+            };
+
+            if ((function.functionCode.Length - index) < 3)
+            {
+                return report;
+            }
+
+            string scriptCodeFixed = function.functionCode.Substring(index);
+
+            if (scriptCodeFixed.StartsWith("var") == true)
+            {
+                report = LuaAnalyzerVariable.DetermineVariable(function, scriptCodeFixed);
+            }
+
+            return report;
         }
 
         private static InstructionAnalyzeReport CheckForInternalInstruction(LuaFunction function, int index)
