@@ -8,6 +8,8 @@ namespace MunchenClient.Lua
 {
     internal class LuaVariable
     {
-
+        internal object variableValue;
+        internal object variableIndex;
+        internal object variableGlobal;
     }
 }

@@ -33,13 +33,13 @@ namespace MunchenClient.Lua.Analyzer
 
             if (scriptCodeFixed.StartsWith("var") == true)
             {
-                report = DetermineVariable(script, scriptCodeFixed);
+                report = DetermineVariable(script, scriptCodeFixed, index);
             }
 
             return report;
         }
 
-        internal static VariableAnalyzeReport DetermineVariable(LuaScript script, string scriptCode)
+        internal static VariableAnalyzeReport DetermineVariable(LuaScript script, string scriptCode, int scriptIndex)
         {
             VariableAnalyzeReport report = new VariableAnalyzeReport
             {
@@ -71,9 +71,7 @@ namespace MunchenClient.Lua.Analyzer
                 return report;
             }
 
-            script.InsertVariable(variableName, LuaAnalyzer.DetermineParameterType(variableValue));
-
-            Console.WriteLine($"Registered Global Variable: {variableName} with value: {variableValue}");
+            script.InsertVariable(variableName, LuaAnalyzer.DetermineParameterType(script, variableValue), scriptIndex, true);
 
             report.found = true;
             report.skipAhead = variableEnd;
@@ -81,7 +79,7 @@ namespace MunchenClient.Lua.Analyzer
             return report;
         }
 
-        internal static VariableAnalyzeReport DetermineVariable(LuaFunction function, string scriptCode)
+        internal static VariableAnalyzeReport DetermineVariable(LuaFunction function, string scriptCode, int scriptIndex)
         {
             VariableAnalyzeReport report = new VariableAnalyzeReport
             {
@@ -113,9 +111,7 @@ namespace MunchenClient.Lua.Analyzer
                 return report;
             }
 
-            function.InsertVariable(variableName, LuaAnalyzer.DetermineParameterType(variableValue));
-
-            Console.WriteLine($"Registered Local Variable: {variableName} with value: {variableValue} under function: {function.functionName}");
+            function.InsertVariable(variableName, LuaAnalyzer.DetermineParameterType(function, variableValue), scriptIndex, false);
 
             report.found = true;
             report.skipAhead = variableEnd;

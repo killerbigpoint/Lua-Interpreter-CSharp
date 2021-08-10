@@ -69,11 +69,11 @@ namespace MunchenClient.Lua.Analyzer
 
             string scriptCodeFixed = function.functionCode.Substring(index);
 
-            foreach(var variable in function.)
+            //foreach(var variable in function.)
 
             if (scriptCodeFixed.StartsWith("var") == true)
             {
-                report = LuaAnalyzerVariable.DetermineVariable(function, scriptCodeFixed);
+                report = LuaAnalyzerVariable.DetermineVariable(function, scriptCodeFixed, index);
             }
 
             return report;
@@ -96,7 +96,7 @@ namespace MunchenClient.Lua.Analyzer
 
             if (scriptCodeFixed.StartsWith("var") == true)
             {
-                report = LuaAnalyzerVariable.DetermineVariable(function, scriptCodeFixed);
+                report = LuaAnalyzerVariable.DetermineVariable(function, scriptCodeFixed, index);
             }
 
             return report;
@@ -152,7 +152,7 @@ namespace MunchenClient.Lua.Analyzer
 
             foreach (string parameter in function.functionCode.Substring(instructionParameterStart + 1, instructionParameterEnd - instructionParameterStart - 1).Split(','))
             {
-                parameters.Add(LuaAnalyzer.DetermineParameterType(parameter.Trim()));
+                parameters.Add(LuaAnalyzer.DetermineParameterType(function, parameter.Trim()));
             }
 
             function.functionExecutionList.Add(new LuaInstructionInternal

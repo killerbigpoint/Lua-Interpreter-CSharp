@@ -62,7 +62,7 @@ namespace MunchenClient.Lua.Analyzer
             return functionCurrentIndex - 1;
         }
 
-        internal static object DetermineParameterType(string parameter)
+        internal static object DetermineParameterType(LuaCodeExecutor parentFunction, string parameter)
         {
             if (parameter[0] == '"' && parameter[parameter.Length - 1] == '"')
             {
@@ -87,6 +87,12 @@ namespace MunchenClient.Lua.Analyzer
             }
 
             //TODO: Potentially add class types from the client here
+            LuaVariable potentialVariable = (LuaVariable)parentFunction.GetVariable(nonStringParameter);
+
+            if (potentialVariable != null)
+            {
+                return potentialVariable.variableValue;
+            }
 
             Console.WriteLine("Returned null here for parameter");
 
