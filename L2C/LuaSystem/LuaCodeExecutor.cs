@@ -13,13 +13,13 @@ namespace MunchenClient.Lua
         private readonly Dictionary<string, LuaVariable> executionVariables = new Dictionary<string, LuaVariable>();
         internal readonly Dictionary<string, LuaFunction> executionFunctions = new Dictionary<string, LuaFunction>();
 
-        internal List<LuaVariable> GetAllVariables()
+        internal Dictionary<string, LuaVariable> GetAllVariables()
         {
-            List<LuaVariable> variables = executionParent.GetAllVariables();
+            Dictionary<string, LuaVariable> variables = executionParent != null ? executionParent.GetAllVariables() : new Dictionary<string, LuaVariable>();
 
             foreach(KeyValuePair<string, LuaVariable> variable in executionVariables)
             {
-                variables.Add(variable.Value);
+                variables.Add(variable.Key, variable.Value);
             }
 
             return variables;
@@ -42,7 +42,26 @@ namespace MunchenClient.Lua
             Console.WriteLine($"Inserted variable: {variableName} at index {variableIndex} (Global: {variableGlobal})");
         }
 
-        internal object GetVariable(string variableName)
+        internal void ManipulateVariable(string variableName, object variableValue)
+        {
+            if (executionVariables.ContainsKey(variableName) == true)
+            {
+                executionVariables[variableName].variableValue = variableValue;
+
+                return;
+            }
+
+            if (executionParent != null)
+            {
+                executionParent.ManipulateVariable(variableName, variableValue);
+
+                return;
+            }
+
+            Console.WriteLine($"No variable found with name: {variableName}");
+        }
+
+        internal LuaVariable GetVariable(string variableName)
         {
             if (executionVariables.ContainsKey(variableName) == true)
             {

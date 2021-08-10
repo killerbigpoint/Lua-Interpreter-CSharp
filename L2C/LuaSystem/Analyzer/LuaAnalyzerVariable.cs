@@ -30,7 +30,7 @@ namespace MunchenClient.Lua.Analyzer
             }
 
             string scriptCodeFixed = script.scriptCode.Substring(index);
-
+            
             if (scriptCodeFixed.StartsWith("var") == true)
             {
                 report = DetermineVariable(script, scriptCodeFixed, index);
@@ -98,18 +98,19 @@ namespace MunchenClient.Lua.Analyzer
 
             int setterIndex = variableCode.IndexOf('=');
 
-            if (setterIndex == -1)
+            if (setterIndex == -1 || setterIndex > variableEnd)
             {
                 return report;
             }
 
             string variableName = variableCode.Substring(0, setterIndex).Trim();
-            string variableValue = variableCode.Substring(setterIndex + 1, variableCode.Length - setterIndex - 1).Trim();
 
             if (function.GetVariable(variableName) != null)
             {
                 return report;
             }
+
+            string variableValue = variableCode.Substring(setterIndex + 1, variableCode.Length - setterIndex - 1).Trim();
 
             function.InsertVariable(variableName, LuaAnalyzer.DetermineParameterType(function, variableValue), scriptIndex, false);
 

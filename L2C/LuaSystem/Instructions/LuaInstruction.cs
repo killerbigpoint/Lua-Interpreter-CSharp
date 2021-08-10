@@ -11,7 +11,7 @@ namespace MunchenClient.Lua.Instructions
         internal LuaFunction instructionFunction;
         internal string instructionName;
         internal string instructionCode;
-        internal object[] instructionParameters;
+        internal List<LuaInstructionVariable> instructionParameters;
 
         internal abstract void ExecuteInstruction();
     }

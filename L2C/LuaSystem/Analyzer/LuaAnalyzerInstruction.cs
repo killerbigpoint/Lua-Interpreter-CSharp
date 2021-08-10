@@ -69,11 +69,46 @@ namespace MunchenClient.Lua.Analyzer
 
             string scriptCodeFixed = function.functionCode.Substring(index);
 
-            //foreach(var variable in function.)
+            //TODO: Check for variable instructions here
+            Dictionary<string, LuaVariable> luaVariables = function.GetAllVariables();
 
-            if (scriptCodeFixed.StartsWith("var") == true)
+            for (int i = 0; i < luaVariables.Count; i++)
             {
-                report = LuaAnalyzerVariable.DetermineVariable(function, scriptCodeFixed, index);
+                KeyValuePair<string, LuaVariable> variable = luaVariables.ElementAt(i);
+
+                if (scriptCodeFixed.StartsWith(variable.Key) == true)
+                {
+                    int variableEnd = scriptCodeFixed.IndexOf(';');
+
+                    if (variableEnd == -1)
+                    {
+                        return report;
+                    }
+
+                    int setterIndex = scriptCodeFixed.IndexOf('=');
+
+                    if (setterIndex == -1 || setterIndex > variableEnd)
+                    {
+                        return report;
+                    }
+
+                    string variableName = scriptCodeFixed.Substring(0, setterIndex).Trim();
+                    string variableValue = scriptCodeFixed.Substring(setterIndex + 1, variableEnd - setterIndex - 1).Trim();
+
+                    function.functionExecutionList.Add(new LuaInstructionVariable
+                    {
+                        instructionFunction = function,
+                        instructionName = $"Variable Manipulator: {variableName}",
+                        instructionCode = scriptCodeFixed.Substring(0, variableEnd),
+                        instructionParameters = null,
+
+                        variableName = variableName,
+                        variableValue = variableValue
+                    });
+
+                    report.found = true;
+                    report.skipAhead = variableEnd;
+                }
             }
 
             return report;
@@ -94,12 +129,12 @@ namespace MunchenClient.Lua.Analyzer
 
             string scriptCodeFixed = function.functionCode.Substring(index);
 
-            if (scriptCodeFixed.StartsWith("var") == true)
+            if (scriptCodeFixed.StartsWith("var") == false)
             {
-                report = LuaAnalyzerVariable.DetermineVariable(function, scriptCodeFixed, index);
+                return report;
             }
 
-            return report;
+            return LuaAnalyzerVariable.DetermineVariable(function, scriptCodeFixed, index);
         }
 
         private static InstructionAnalyzeReport CheckForInternalInstruction(LuaFunction function, int index)
@@ -148,11 +183,16 @@ namespace MunchenClient.Lua.Analyzer
                 }
             }
 
-            List<object> parameters = new List<object>();
+            List<LuaInstructionVariable> parameters = new List<LuaInstructionVariable>();
 
             foreach (string parameter in function.functionCode.Substring(instructionParameterStart + 1, instructionParameterEnd - instructionParameterStart - 1).Split(','))
             {
-                parameters.Add(LuaAnalyzer.DetermineParameterType(function, parameter.Trim()));
+                parameters.Add(new LuaInstructionVariable
+                {
+                    instructionFunction = function,
+                    variableName = parameter,
+                    variableValue = LuaAnalyzer.DetermineParameterType(function, parameter.Trim())
+                });
             }
 
             function.functionExecutionList.Add(new LuaInstructionInternal
@@ -160,7 +200,7 @@ namespace MunchenClient.Lua.Analyzer
                 instructionFunction = function,
                 instructionName = instructionName,
                 instructionCode = function.functionCode.Substring(index, instructionEndIndex - index),
-                instructionParameters = parameters.ToArray()
+                instructionParameters = parameters
             });
 
             report.found = true;
