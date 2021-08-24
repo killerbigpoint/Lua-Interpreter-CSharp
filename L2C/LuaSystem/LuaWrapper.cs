@@ -57,6 +57,11 @@ namespace MunchenClient.Lua
 
         internal static bool RegisterFunctionCallback(string functionName, Type internalClass, string internalFunctionName)
         {
+            if(functionName.Contains(".") == true)
+            {
+
+            }
+
             bool success = false;
 
             foreach(MethodInfo method in internalClass.GetMethods())
