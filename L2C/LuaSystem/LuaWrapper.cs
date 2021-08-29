@@ -16,28 +16,33 @@ namespace MunchenClient.Lua
     
     internal class LuaWrapper
     {
-        private static readonly Dictionary<string, Dictionary<int, FastMethodInfo>> callbacks = new Dictionary<string, Dictionary<int, FastMethodInfo>>();
+        private static readonly Dictionary<string, LuaClassWrapper> classes = new Dictionary<string, LuaClassWrapper>();
 
-        internal static bool InternalFunctionExists(string functionName)
+        internal static bool InternalFunctionExists(string className, string functionName)
         {
-            return callbacks.ContainsKey(functionName);
+            if(classes.ContainsKey(className) == false)
+            {
+                return false;
+            }
+
+            return classes[className].functions.ContainsKey(functionName);
         }
 
-        internal static CallbackStatus CallInternalFunction(string functionName, object[] parameters)
+        internal static CallbackStatus CallInternalFunction(string className, string functionName, object[] parameters)
         {
-            if (callbacks.ContainsKey(functionName) == false)
+            if (InternalFunctionExists(className, functionName) == false)
             {
                 return CallbackStatus.CallbackStatus_FunctionNonExistant;
             }
 
-            if (callbacks[functionName].ContainsKey(parameters.Length) == false)
+            if (classes[className].functions[functionName].ContainsKey(parameters.Length) == false)
             {
                 return CallbackStatus.CallbackStatus_WrongParameters;
             }
 
             try
             {
-                callbacks[functionName][parameters.Length].Invoke(null, parameters);
+                classes[className].functions[functionName][parameters.Length].Invoke(null, parameters);
             }
             catch (ArgumentException)
             {
@@ -57,11 +62,6 @@ namespace MunchenClient.Lua
 
         internal static bool RegisterFunctionCallback(string functionName, Type internalClass, string internalFunctionName)
         {
-            if(functionName.Contains(".") == true)
-            {
-
-            }
-
             bool success = false;
 
             foreach(MethodInfo method in internalClass.GetMethods())
@@ -71,7 +71,7 @@ namespace MunchenClient.Lua
                     continue;
                 }
 
-                if(RegisterFunctionCallback(functionName, method) == true)
+                if(RegisterFunctionCallback(internalClass.Name, functionName, method) == true)
                 {
                     success = true;
                 }
@@ -80,26 +80,31 @@ namespace MunchenClient.Lua
             return success;
         }
 
-        internal static bool RegisterFunctionCallback(string functionName, MethodInfo internalFunction)
+        internal static bool RegisterFunctionCallback(string className, string functionName, MethodInfo internalFunction)
         {
             if (internalFunction == null)
             {
                 return false;
             }
 
-            if (callbacks.ContainsKey(functionName) == false)
-            {
-                callbacks.Add(functionName, new Dictionary<int, FastMethodInfo>());
-            }
-
-            int internalFunctionParameterCount = internalFunction.GetParameters().Length;
-
-            if (callbacks[functionName].ContainsKey(internalFunctionParameterCount) == true)
+            if (InternalFunctionExists(className, functionName) == false)
             {
                 return false;
             }
 
-            callbacks[functionName].Add(internalFunctionParameterCount, new FastMethodInfo(internalFunction));
+            if (classes[className].functions.ContainsKey(functionName) == false)
+            {
+                classes[className].functions.Add(functionName, new Dictionary<int, FastMethodInfo>());
+            }
+
+            int internalFunctionParameterCount = internalFunction.GetParameters().Length;
+
+            if (classes[className].functions[functionName].ContainsKey(internalFunctionParameterCount) == true)
+            {
+                return false;
+            }
+
+            classes[className].functions[functionName].Add(internalFunctionParameterCount, new FastMethodInfo(internalFunction));
 
             return true;
         }

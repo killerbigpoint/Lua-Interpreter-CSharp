@@ -166,10 +166,29 @@ namespace MunchenClient.Lua.Analyzer
                 return report;
             }
 
-            string instructionName = function.functionCode.Substring(index, instructionParameterStart - index);
+            string instructionNameFull = function.functionCode.Substring(0, instructionParameterStart).Trim();
 
-            if (LuaWrapper.InternalFunctionExists(instructionName) == false)
+            if(instructionNameFull.Contains(".") == true)
             {
+                string[] instructionSplit = instructionNameFull.Split('.');
+
+                if (instructionSplit.Length > 2)
+                {
+                    Console.WriteLine("Instrucion was deeper than we thought");
+
+                    return report;
+                }
+
+                foreach (string instruction in instructionSplit)
+                {
+                    Console.WriteLine("Instrucion Split: " + instruction);
+                }
+            }
+
+            if (LuaWrapper.InternalFunctionExists(instructionSplit[0], instructionSplit[1]) == false)
+            {
+                Console.WriteLine("Instruction doesn't exist: " + instructionNameFull);
+
                 return report;
             }
 
@@ -198,7 +217,7 @@ namespace MunchenClient.Lua.Analyzer
             function.functionExecutionList.Add(new LuaInstructionInternal
             {
                 instructionFunction = function,
-                instructionName = instructionName,
+                instructionName = instructionNameFull,
                 instructionCode = function.functionCode.Substring(index, instructionEndIndex - index),
                 instructionParameters = parameters
             });
