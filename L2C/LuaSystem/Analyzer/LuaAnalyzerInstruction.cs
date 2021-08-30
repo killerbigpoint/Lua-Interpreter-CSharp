@@ -151,50 +151,53 @@ namespace MunchenClient.Lua.Analyzer
                 return report;
             }
 
-            int instructionEndIndex = function.functionCode.IndexOf(";", index);
+            string functionCode = function.functionCode.Substring(index).Trim();
+            string functionClass = string.Empty;
+
+            bool foundClass = false;
+
+            foreach (var registeredClass in LuaWrapper.classes)
+            {
+                if (functionCode.StartsWith(registeredClass.Key) == true)
+                {
+                    functionClass = registeredClass.Key;
+                    foundClass = true;
+
+                    break;
+                }
+            }
+
+            if(foundClass == false)
+            {
+                return report;
+            }
+
+            int instructionEndIndex = functionCode.IndexOf(";");
 
             if (instructionEndIndex == -1)
             {
                 return report;
             }
 
-            int instructionParameterStart = function.functionCode.IndexOf("(", index);
-            int instructionParameterEnd = function.functionCode.IndexOf(")", index);
+            int instructionParameterStart = functionCode.IndexOf("(");
+            int instructionParameterEnd = functionCode.IndexOf(")");
 
             if (instructionParameterStart == -1 || instructionParameterEnd == -1 || instructionParameterStart > instructionParameterEnd)
             {
                 return report;
             }
 
-            string instructionNameFull = function.functionCode.Substring(0, instructionParameterStart).Trim();
+            string instructionNameFull = functionCode.Substring(0, instructionParameterStart).Trim();
+            string instructionActual = instructionNameFull.Split('.')[1];
 
-            if(instructionNameFull.Contains(".") == true)
+            if (LuaWrapper.InternalFunctionExists(functionClass, instructionActual) == false)
             {
-                string[] instructionSplit = instructionNameFull.Split('.');
-
-                if (instructionSplit.Length > 2)
-                {
-                    Console.WriteLine("Instrucion was deeper than we thought");
-
-                    return report;
-                }
-
-                foreach (string instruction in instructionSplit)
-                {
-                    Console.WriteLine("Instrucion Split: " + instruction);
-                }
-            }
-
-            if (LuaWrapper.InternalFunctionExists(instructionSplit[0], instructionSplit[1]) == false)
-            {
-                Console.WriteLine("Instruction doesn't exist: " + instructionNameFull);
-
                 return report;
             }
 
             if (index > 1)
             {
-                int commentedOutIndex = function.functionCode.IndexOf("//", index - 2, 2);
+                int commentedOutIndex = functionCode.IndexOf("//", index - 2, 2);
 
                 if (commentedOutIndex != -1)
                 {
@@ -204,7 +207,7 @@ namespace MunchenClient.Lua.Analyzer
 
             List<LuaInstructionVariable> parameters = new List<LuaInstructionVariable>();
 
-            foreach (string parameter in function.functionCode.Substring(instructionParameterStart + 1, instructionParameterEnd - instructionParameterStart - 1).Split(','))
+            foreach (string parameter in functionCode.Substring(instructionParameterStart + 1, instructionParameterEnd - instructionParameterStart - 1).Split(','))
             {
                 parameters.Add(new LuaInstructionVariable
                 {
@@ -217,13 +220,14 @@ namespace MunchenClient.Lua.Analyzer
             function.functionExecutionList.Add(new LuaInstructionInternal
             {
                 instructionFunction = function,
-                instructionName = instructionNameFull,
-                instructionCode = function.functionCode.Substring(index, instructionEndIndex - index),
+                instructionClass = functionClass,
+                instructionName = instructionActual,
+                instructionCode = functionCode.Substring(0, instructionEndIndex),
                 instructionParameters = parameters
             });
 
             report.found = true;
-            report.skipAhead = instructionEndIndex - index;
+            report.skipAhead = instructionEndIndex;
 
             return report;
         }

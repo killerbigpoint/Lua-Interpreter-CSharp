@@ -14,7 +14,7 @@ namespace MunchenClient.Lua.Instructions
                 variabler.Add(lmao.GetUpdatedValue());
             }
 
-            LuaWrapper.CallInternalFunction("", instructionName, variabler.ToArray());
+            LuaWrapper.CallInternalFunction(instructionClass, instructionName, variabler.ToArray());
         }
     }
 }

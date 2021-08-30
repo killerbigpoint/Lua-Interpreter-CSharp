@@ -5,29 +5,15 @@ namespace L2C
 {
     class Program
     {
-        public static void OutputToConsole(string text)
-        {
-            Console.WriteLine($"OutputToConsole: {text}");
-        }
-
-        public static void OutputToConsole(string text, string text2)
-        {
-            Console.WriteLine($"OutputToConsole 2: {text} + {text2}");
-        }
-
-        public static void OutputBoolean(bool boolean)
-        {
-            Console.WriteLine($"OutputBoolean: {boolean}");
-        }
-
         public static void Main(string[] args)
         {
             //LuaAPI
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
 
-            LuaWrapper.RegisterFunctionCallback("Log", typeof(Program), nameof(OutputToConsole));
-            LuaWrapper.RegisterFunctionCallback("Boolean", typeof(Program), nameof(OutputBoolean));
+            LuaClassWrapper classWrapper = LuaWrapper.RegisterClassCallback(typeof(Debug));
+            LuaWrapper.RegisterFunctionCallback(classWrapper, nameof(Debug.OutputToConsole), "Log");
+            LuaWrapper.RegisterFunctionCallback(classWrapper, nameof(Debug.OutputBoolean), "Boolean");
 
             stopwatch.Stop();
 

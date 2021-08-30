@@ -16,7 +16,7 @@ namespace MunchenClient.Lua
     
     internal class LuaWrapper
     {
-        private static readonly Dictionary<string, LuaClassWrapper> classes = new Dictionary<string, LuaClassWrapper>();
+        internal static readonly Dictionary<string, LuaClassWrapper> classes = new Dictionary<string, LuaClassWrapper>();
 
         internal static bool InternalFunctionExists(string className, string functionName)
         {
@@ -43,6 +43,8 @@ namespace MunchenClient.Lua
             try
             {
                 classes[className].functions[functionName][parameters.Length].Invoke(null, parameters);
+
+                return CallbackStatus.CallbackStatus_Success;
             }
             catch (ArgumentException)
             {
@@ -57,21 +59,39 @@ namespace MunchenClient.Lua
                 return CallbackStatus.CallbackStatus_UnknownError;
             }
 
-            return CallbackStatus.CallbackStatus_Success;
+            return CallbackStatus.CallbackStatus_Unknown;
         }
 
-        internal static bool RegisterFunctionCallback(string functionName, Type internalClass, string internalFunctionName)
+        internal static LuaClassWrapper RegisterClassCallback(Type internalClass)
+        {
+            if (classes.ContainsKey(internalClass.Name) == true)
+            {
+                return null;
+            }
+
+            LuaClassWrapper classWrapper = new LuaClassWrapper()
+            {
+                className = internalClass.Name,
+                classType = internalClass
+            };
+
+            classes.Add(internalClass.Name, classWrapper);
+
+            return classWrapper;
+        }
+
+        internal static bool RegisterFunctionCallback(LuaClassWrapper classWrapper, string internalFunctionName)
         {
             bool success = false;
 
-            foreach(MethodInfo method in internalClass.GetMethods())
+            foreach (MethodInfo method in classWrapper.classType.GetMethods())
             {
                 if (method.Name.Equals(internalFunctionName) == false)
                 {
                     continue;
                 }
 
-                if(RegisterFunctionCallback(internalClass.Name, functionName, method) == true)
+                if (RegisterFunctionCallback(classWrapper.className, method, method.Name) == true)
                 {
                     success = true;
                 }
@@ -80,14 +100,34 @@ namespace MunchenClient.Lua
             return success;
         }
 
-        internal static bool RegisterFunctionCallback(string className, string functionName, MethodInfo internalFunction)
+        internal static bool RegisterFunctionCallback(LuaClassWrapper classWrapper, string internalFunctionName, string functionName)
+        {
+            bool success = false;
+
+            foreach(MethodInfo method in classWrapper.classType.GetMethods())
+            {
+                if (method.Name.Equals(internalFunctionName) == false)
+                {
+                    continue;
+                }
+
+                if(RegisterFunctionCallback(classWrapper.className, method, functionName) == true)
+                {
+                    success = true;
+                }
+            }
+
+            return success;
+        }
+
+        internal static bool RegisterFunctionCallback(string className, MethodInfo internalFunction, string functionName)
         {
             if (internalFunction == null)
             {
                 return false;
             }
 
-            if (InternalFunctionExists(className, functionName) == false)
+            if (InternalFunctionExists(className, functionName) == true)
             {
                 return false;
             }

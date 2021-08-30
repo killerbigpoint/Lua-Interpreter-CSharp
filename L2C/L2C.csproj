@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Debug.cs" />
     <Compile Include="LuaSystem\LuaClassWrapper.cs" />
     <Compile Include="LuaSystem\LuaCodeExecutor.cs" />
     <Compile Include="LuaSystem\Analyzer\LuaAnalyzerFunction.cs" />
