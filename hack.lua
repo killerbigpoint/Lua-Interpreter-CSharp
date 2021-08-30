@@ -1,39 +1,45 @@
-int test = 1;
-float number = 1.5f;
+var test = 1;
+var number = 1.5f;
 
 function OnUpdate()
 {
-	console.boolean(true);
-	console.boolean(false);
+	var carsten = "omegalul";
+	var magisk = 1337;
 	
-	console.log("Hello World");
-	console.log("Hello", "World");
+	Debug.Log(carsten);
+	
+	carsten = "sejereje";
+	
+	Debug.Log(carsten);
+	
+	Debug.Log("Hello World");
+	Debug.Log("Hello", "World");
 	
 	if(1 == 2)
 	{
-		console.log("Israel");
+		Debug.Log("Test 1");
 	}
 	else
 	{
-		console.log("Hebrew");
+		Debug.Log("Test 2");
 	}
 	
 	if(4 == 4)
 	{
-		console.log("Denmark");
+		Debug.Log("Test 3");
 		
 		if(5 == 2)
 		{
-			console.log("Germany");
+			Debug.Log("Test 4");
 		}
 		else
 		{
-			console.log("German");
+			Debug.Log("Test 5");
 		}
 	}
 	else
 	{
-		console.log("Danish");
+		Debug.Log("Test 6");
 	}
 }
 
