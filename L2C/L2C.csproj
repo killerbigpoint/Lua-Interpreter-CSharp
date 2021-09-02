@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Debug.cs" />
+    <Compile Include="LuaSystem\Utils\LuaComparator.cs" />
     <Compile Include="LuaSystem\LuaClassWrapper.cs" />
     <Compile Include="LuaSystem\LuaCodeExecutor.cs" />
     <Compile Include="LuaSystem\Analyzer\LuaAnalyzerFunction.cs" />
@@ -62,6 +63,7 @@
     <Compile Include="LuaSystem\LuaScript.cs" />
     <Compile Include="LuaSystem\LuaVariable.cs" />
     <Compile Include="LuaSystem\LuaWrapper.cs" />
+    <Compile Include="LuaSystem\Utils\LuaManipulator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

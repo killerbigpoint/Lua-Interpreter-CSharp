@@ -1,8 +1,9 @@
 ﻿using MunchenClient.Lua.Instructions;
+using MunchenClient.Lua.Utils;
 using System.Collections.Generic;
-using System;
-using System.Reflection;
 using System.Linq;
+using System;
+using L2C.LuaSystem.Utils;
 
 namespace MunchenClient.Lua.Analyzer
 {
@@ -69,7 +70,6 @@ namespace MunchenClient.Lua.Analyzer
 
             string scriptCodeFixed = function.functionCode.Substring(index);
 
-            //TODO: Check for variable instructions here
             Dictionary<string, LuaVariable> luaVariables = function.GetAllVariables();
 
             for (int i = 0; i < luaVariables.Count; i++)
@@ -85,23 +85,28 @@ namespace MunchenClient.Lua.Analyzer
                         return report;
                     }
 
-                    int setterIndex = scriptCodeFixed.IndexOf('=');
+                    string instructionCode = scriptCodeFixed.Substring(0, variableEnd);
 
-                    if (setterIndex == -1 || setterIndex > variableEnd)
+                    Manipulator manipulator = LuaManipulator.FindManipulator(instructionCode);
+
+                    if(manipulator.manipulatorIndex == -1)
                     {
                         return report;
                     }
 
-                    string variableName = scriptCodeFixed.Substring(0, setterIndex).Trim();
-                    string variableValue = scriptCodeFixed.Substring(setterIndex + 1, variableEnd - setterIndex - 1).Trim();
+                    Console.WriteLine($"Variable Manipulator: {manipulator.manipulatorType}");
+
+                    string variableName = instructionCode.Substring(0, manipulator.manipulatorIndex).Trim();
+                    string variableValue = instructionCode.Substring(manipulator.manipulatorIndex + 1, variableEnd - manipulator.manipulatorIndex - 1).Trim();
 
                     function.functionExecutionList.Add(new LuaInstructionVariable
                     {
                         instructionFunction = function,
                         instructionName = $"Variable Manipulator: {variableName}",
-                        instructionCode = scriptCodeFixed.Substring(0, variableEnd),
+                        instructionCode = instructionCode,
                         instructionParameters = null,
 
+                        variableManipulator = manipulator,
                         variableName = variableName,
                         variableValue = variableValue
                     });
@@ -257,7 +262,7 @@ namespace MunchenClient.Lua.Analyzer
 
             string statement = function.functionCode.Substring(instructionParameterStart + 1, instructionParameterEnd - instructionParameterStart - 1);
 
-            Comparator comparator = FindComparator(statement);
+            Comparator comparator = LuaComparator.FindComparator(statement);
 
             if (comparator.comparatorType == ComparatorType.ComparatorType_Unknown)
             {
@@ -330,88 +335,6 @@ namespace MunchenClient.Lua.Analyzer
             report.found = true;
 
             return report;
-        }
-
-        private static Comparator FindComparator(string statement)
-        {
-            //Comparator Check for "=="
-            int comparatorIndex = statement.IndexOf("==");
-
-            if (comparatorIndex != -1)
-            {
-                return new Comparator
-                {
-                    comparatorIndex = comparatorIndex,
-                    comparatorType = ComparatorType.ComparatorType_EqualTo
-                };
-            }
-
-            //Comparator Check for "!="
-            comparatorIndex = statement.IndexOf("!=");
-
-            if (comparatorIndex != -1)
-            {
-                return new Comparator
-                {
-                    comparatorIndex = comparatorIndex,
-                    comparatorType = ComparatorType.ComparatorType_NotEqualTo
-                };
-            }
-
-            //Comparator Check for "<"
-            comparatorIndex = statement.IndexOf("<");
-
-            if (comparatorIndex != -1)
-            {
-                return new Comparator
-                {
-                    comparatorIndex = comparatorIndex,
-                    comparatorType = ComparatorType.ComparatorType_LessThan
-                };
-            }
-
-            //Comparator Check for ">"
-            comparatorIndex = statement.IndexOf(">");
-
-            if (comparatorIndex != -1)
-            {
-                return new Comparator
-                {
-                    comparatorIndex = comparatorIndex,
-                    comparatorType = ComparatorType.ComparatorType_MoreThan
-                };
-            }
-
-            //Comparator Check for "<="
-            comparatorIndex = statement.IndexOf("<=");
-
-            if (comparatorIndex != -1)
-            {
-                return new Comparator
-                {
-                    comparatorIndex = comparatorIndex,
-                    comparatorType = ComparatorType.ComparatorType_LessOrEqualThan
-                };
-            }
-
-            //Comparator Check for ">="
-            comparatorIndex = statement.IndexOf(">=");
-
-            if (comparatorIndex != -1)
-            {
-                return new Comparator
-                {
-                    comparatorIndex = comparatorIndex,
-                    comparatorType = ComparatorType.ComparatorType_MoreOrEqualThan
-                };
-            }
-
-            //Last Resort
-            return new Comparator
-            {
-                comparatorIndex = -1,
-                comparatorType = ComparatorType.ComparatorType_Unknown
-            };
         }
     }
 }

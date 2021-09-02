@@ -58,8 +58,6 @@ namespace MunchenClient.Lua
 
                 return CallbackStatus.CallbackStatus_UnknownError;
             }
-
-            return CallbackStatus.CallbackStatus_Unknown;
         }
 
         internal static LuaClassWrapper RegisterClassCallback(Type internalClass)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using L2C.LuaSystem.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,7 @@ namespace MunchenClient.Lua.Instructions
 {
     internal class LuaInstructionVariable : LuaInstruction
     {
+        internal Manipulator variableManipulator;
         internal string variableName;
         internal object variableValue;
 

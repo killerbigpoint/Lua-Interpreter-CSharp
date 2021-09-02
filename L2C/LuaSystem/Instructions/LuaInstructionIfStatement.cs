@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MunchenClient.Lua.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,23 +7,6 @@ using System.Threading.Tasks;
 
 namespace MunchenClient.Lua.Instructions
 {
-    internal enum ComparatorType : short
-    {
-        ComparatorType_Unknown = 0,
-        ComparatorType_EqualTo = 1,
-        ComparatorType_NotEqualTo = 2,
-        ComparatorType_LessThan = 3,
-        ComparatorType_MoreThan = 4,
-        ComparatorType_MoreOrEqualThan = 5,
-        ComparatorType_LessOrEqualThan = 6,
-    }
-
-    internal struct Comparator
-    {
-        internal int comparatorIndex;
-        internal ComparatorType comparatorType;
-    }
-
     internal class LuaInstructionIfStatement : LuaInstruction
     {
         internal Comparator argumentComparator;
