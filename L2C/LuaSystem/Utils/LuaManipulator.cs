@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace L2C.LuaSystem.Utils
+namespace MunchenClient.Lua.Utils
 {
     internal enum ManipulatorType : short
     {

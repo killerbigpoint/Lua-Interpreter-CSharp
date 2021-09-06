@@ -1,4 +1,4 @@
-﻿using L2C.LuaSystem.Utils;
+﻿using MunchenClient.Lua.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +15,7 @@ namespace MunchenClient.Lua.Instructions
 
         internal override void ExecuteInstruction()
         {
-            instructionFunction.ManipulateVariable(variableName, variableValue);
+            instructionFunction.ManipulateVariable(variableManipulator, variableName, variableValue);
         }
 
         internal object GetUpdatedValue()

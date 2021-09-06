@@ -1,5 +1,6 @@
-﻿using System;
+﻿using MunchenClient.Lua.Utils;
 using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,23 +43,41 @@ namespace MunchenClient.Lua
             Console.WriteLine($"Inserted variable: {variableName} at index {variableIndex} (Global: {variableGlobal})");
         }
 
-        internal void ManipulateVariable(string variableName, object variableValue)
+        internal void ManipulateVariable(Manipulator manipulator, string variableName, object variableValue)
         {
             if (executionVariables.ContainsKey(variableName) == true)
             {
-                executionVariables[variableName].variableValue = variableValue;
+                ManipulateVariableWithComparator(manipulator, ref executionVariables[variableName].variableValue, variableValue);
 
                 return;
             }
 
             if (executionParent != null)
             {
-                executionParent.ManipulateVariable(variableName, variableValue);
+                executionParent.ManipulateVariable(manipulator, variableName, variableValue);
 
                 return;
             }
 
             Console.WriteLine($"No variable found with name: {variableName}");
+        }
+
+        internal void ManipulateVariableWithComparator(Manipulator manipulator, ref object variableName, object variableSecondValue)
+        {
+            switch(manipulator.manipulatorType)
+            {
+                case ManipulatorType.ManipulatorType_Assign:
+                {
+                    variableName = variableSecondValue;
+
+                    break;
+                }
+
+                case ManipulatorType.ManipulatorType_Addition:
+                {
+                    break;
+                }
+            }
         }
 
         internal LuaVariable GetVariable(string variableName)
