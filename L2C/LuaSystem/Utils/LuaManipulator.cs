@@ -21,6 +21,7 @@ namespace MunchenClient.Lua.Utils
     internal struct Manipulator
     {
         internal int manipulatorIndex;
+        internal int manipulatorIndexLength;
         internal ManipulatorType manipulatorType;
     }
 
@@ -36,6 +37,7 @@ namespace MunchenClient.Lua.Utils
                 return new Manipulator
                 {
                     manipulatorIndex = comparatorIndex,
+                    manipulatorIndexLength = 2,
                     manipulatorType = ManipulatorType.ManipulatorType_Increment
                 };
             }
@@ -48,23 +50,12 @@ namespace MunchenClient.Lua.Utils
                 return new Manipulator
                 {
                     manipulatorIndex = comparatorIndex,
+                    manipulatorIndexLength = 2,
                     manipulatorType = ManipulatorType.ManipulatorType_Decrement
                 };
             }
 
-            //Manipulator Check for "="
-            comparatorIndex = statement.IndexOf("=");
-
-            if (comparatorIndex != -1)
-            {
-                return new Manipulator
-                {
-                    manipulatorIndex = comparatorIndex,
-                    manipulatorType = ManipulatorType.ManipulatorType_Assign
-                };
-            }
-
-            //Manipulator Check for "+"
+            //Manipulator Check for "+="
             comparatorIndex = statement.IndexOf("+=");
 
             if (comparatorIndex != -1)
@@ -72,11 +63,12 @@ namespace MunchenClient.Lua.Utils
                 return new Manipulator
                 {
                     manipulatorIndex = comparatorIndex,
+                    manipulatorIndexLength = 2,
                     manipulatorType = ManipulatorType.ManipulatorType_Addition
                 };
             }
 
-            //Manipulator Check for "-"
+            //Manipulator Check for "-="
             comparatorIndex = statement.IndexOf("-=");
 
             if (comparatorIndex != -1)
@@ -84,6 +76,7 @@ namespace MunchenClient.Lua.Utils
                 return new Manipulator
                 {
                     manipulatorIndex = comparatorIndex,
+                    manipulatorIndexLength = 2,
                     manipulatorType = ManipulatorType.ManipulatorType_Subtract
                 };
             }
@@ -96,6 +89,7 @@ namespace MunchenClient.Lua.Utils
                 return new Manipulator
                 {
                     manipulatorIndex = comparatorIndex,
+                    manipulatorIndexLength = 2,
                     manipulatorType = ManipulatorType.ManipulatorType_Multiply
                 };
             }
@@ -108,7 +102,21 @@ namespace MunchenClient.Lua.Utils
                 return new Manipulator
                 {
                     manipulatorIndex = comparatorIndex,
+                    manipulatorIndexLength = 2,
                     manipulatorType = ManipulatorType.ManipulatorType_Division
+                };
+            }
+
+            //Manipulator Check for "="
+            comparatorIndex = statement.IndexOf("=");
+
+            if (comparatorIndex != -1)
+            {
+                return new Manipulator
+                {
+                    manipulatorIndex = comparatorIndex,
+                    manipulatorIndexLength = 1,
+                    manipulatorType = ManipulatorType.ManipulatorType_Assign
                 };
             }
 
@@ -116,6 +124,7 @@ namespace MunchenClient.Lua.Utils
             return new Manipulator
             {
                 manipulatorIndex = -1,
+                manipulatorIndexLength = 0,
                 manipulatorType = ManipulatorType.ManipulatorType_Unknown
             };
         }

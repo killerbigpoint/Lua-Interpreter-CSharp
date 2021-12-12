@@ -3,7 +3,6 @@ using MunchenClient.Lua.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using L2C.LuaSystem.Utils;
 
 namespace MunchenClient.Lua.Analyzer
 {
@@ -94,11 +93,9 @@ namespace MunchenClient.Lua.Analyzer
                         return report;
                     }
 
-                    Console.WriteLine($"Variable Manipulator: {manipulator.manipulatorType}");
-
                     string variableName = instructionCode.Substring(0, manipulator.manipulatorIndex).Trim();
-                    string variableValue = instructionCode.Substring(manipulator.manipulatorIndex + 1, variableEnd - manipulator.manipulatorIndex - 1).Trim();
-
+                    string variableValue = instructionCode.Substring(manipulator.manipulatorIndex + manipulator.manipulatorIndexLength, variableEnd - manipulator.manipulatorIndex - manipulator.manipulatorIndexLength).Trim();
+                    
                     function.functionExecutionList.Add(new LuaInstructionVariable
                     {
                         instructionFunction = function,

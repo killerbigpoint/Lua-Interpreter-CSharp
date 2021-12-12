@@ -62,19 +62,21 @@ namespace MunchenClient.Lua
             Console.WriteLine($"No variable found with name: {variableName}");
         }
 
-        internal void ManipulateVariableWithComparator(Manipulator manipulator, ref object variableName, object variableSecondValue)
+        internal void ManipulateVariableWithComparator(Manipulator manipulator, ref object variableFirstValue, object variableSecondValue)
         {
             switch(manipulator.manipulatorType)
             {
                 case ManipulatorType.ManipulatorType_Assign:
                 {
-                    variableName = variableSecondValue;
+                    variableFirstValue = variableSecondValue;
 
                     break;
                 }
 
                 case ManipulatorType.ManipulatorType_Addition:
                 {
+                    
+
                     break;
                 }
             }
