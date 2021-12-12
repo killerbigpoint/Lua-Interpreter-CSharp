@@ -64,6 +64,18 @@ namespace MunchenClient.Lua
 
         internal void ManipulateVariableWithComparator(Manipulator manipulator, ref object variableFirstValue, object variableSecondValue)
         {
+            Type firstValueType = variableFirstValue.GetType();
+            Type secondValueType = variableSecondValue.GetType();
+
+            Console.WriteLine("Type: " + firstValueType.Name);
+
+            if(firstValueType != secondValueType)
+            {
+                Console.WriteLine("Types are not the same smh");
+
+                return;
+            }
+
             switch(manipulator.manipulatorType)
             {
                 case ManipulatorType.ManipulatorType_Assign:
@@ -75,7 +87,25 @@ namespace MunchenClient.Lua
 
                 case ManipulatorType.ManipulatorType_Addition:
                 {
-                    
+                    switch(firstValueType.Name)
+                        {
+                            case "String":
+                            {
+                                string firstValue = (string)variableFirstValue;
+                                string secondValue = (string)variableSecondValue;
+
+                                variableFirstValue = firstValue + secondValue;
+
+                                Console.WriteLine("Manipulated with a string");
+
+                                break;
+                            }
+
+                            case "Double":
+                            {
+                                break;
+                            }
+                        }
 
                     break;
                 }
