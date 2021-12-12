@@ -7,14 +7,14 @@ namespace MunchenClient.Lua.Instructions
     {
         internal override void ExecuteInstruction()
         {
-            List<object> variabler = new List<object>();
+            object[] variables = new object[instructionParameters.Count];
 
-            foreach(var lmao in instructionParameters)
+            for(int i = 0; i < instructionParameters.Count; i++)
             {
-                variabler.Add(lmao.GetUpdatedValue());
+                variables[i] = instructionParameters[i].GetUpdatedValue();
             }
 
-            LuaWrapper.CallInternalFunction(instructionClass, instructionName, variabler.ToArray());
+            LuaWrapper.CallInternalFunction(instructionClass, instructionName, variables);
         }
     }
 }
