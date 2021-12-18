@@ -66,7 +66,7 @@ namespace MunchenClient.Lua.Analyzer
         {
             if (parameter[0] == '"' && parameter[parameter.Length - 1] == '"')
             {
-                return parameter;
+                return parameter.Substring(1, parameter.Length - 2);
             }
 
             string nonStringParameter = parameter.Substring(0, parameter.Length - (parameter.EndsWith("f") ? 1 : 0));
@@ -87,7 +87,7 @@ namespace MunchenClient.Lua.Analyzer
             }
 
             //TODO: Potentially add class types from the client here
-            LuaVariable potentialVariable = (LuaVariable)parentFunction.GetVariable(nonStringParameter);
+            LuaVariable potentialVariable = parentFunction.GetVariable(nonStringParameter);
 
             if (potentialVariable != null)
             {

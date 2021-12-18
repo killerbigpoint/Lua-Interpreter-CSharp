@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MunchenClient.Lua.Analyzer;
 
 namespace MunchenClient.Lua
 {
@@ -94,7 +95,8 @@ namespace MunchenClient.Lua
                                 string firstValue = (string)variableFirstValue;
                                 string secondValue = (string)variableSecondValue;
 
-                                variableFirstValue = firstValue + secondValue;
+                                string variableValue = (string)LuaAnalyzer.DetermineParameterType(null, firstValue) + (string)LuaAnalyzer.DetermineParameterType(null, secondValue);
+                                variableFirstValue = variableValue;
 
                                 Console.WriteLine("Manipulated with a string");
 
